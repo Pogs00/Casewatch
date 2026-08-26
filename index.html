@@ -371,8 +371,9 @@ function saveJSON(key, val){
 
 let tasks = loadJSON(LS_TASKS, sampleTasks());
 let statuses = loadJSON(LS_STATUSES, DEFAULT_STATUSES);
-let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch'});
+let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch', pdfOrientation:'portrait'});
 if(!settings.appName) settings.appName = 'CaseWatch';
+if(!settings.pdfOrientation) settings.pdfOrientation = 'portrait';
 const LS_CLIENTS = 'casewatch_clients_v1';
 let extraClients = loadJSON(LS_CLIENTS, []); // clients added manually before they have any test cases
 function persistClients(){ saveJSON(LS_CLIENTS, extraClients); }
@@ -594,7 +595,7 @@ function render(){
     title.textContent = 'Test Cases';
     sub.textContent = scopeLabel + moduleSuffix + ' · sorted by ID ascending';
     actions.innerHTML = `
-      <button class="btn" onclick="exportReportPDF()">${iconFile()} Export PDF</button>
+      <button class="btn" onclick="openPdfExportModal()">${iconFile()} Export PDF</button>
       <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
     `;
     content.innerHTML = renderCasesView();
@@ -1409,7 +1410,7 @@ function renderSyncView(){
         <h3>${iconFile()} PDF report</h3>
         <p class="desc">Generate a printable report of the currently selected client's test cases (respects active filters), sorted by ID ascending.</p>
         <div class="sync-row">
-          <button class="btn btn-primary" onclick="exportReportPDF()">${iconFile()} Generate PDF report</button>
+          <button class="btn btn-primary" onclick="openPdfExportModal()">${iconFile()} Generate PDF report</button>
         </div>
       </div>
 
@@ -1448,11 +1449,62 @@ function renderSyncView(){
 /* =========================================================
    PDF REPORT
    ========================================================= */
-function exportReportPDF(){
+/* =========================================================
+   PDF ORIENTATION PICKER
+   ========================================================= */
+function openPdfExportModal(){
+  const orientation = settings.pdfOrientation === 'landscape' ? 'landscape' : 'portrait';
+  const html = `
+  <div class="modal-backdrop" onclick="if(event.target===this) closePdfExportModal()">
+    <div class="modal modal-sm">
+      <div class="modal-head">
+        <h2>Export PDF report</h2>
+        <button class="icon-btn" onclick="closePdfExportModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:var(--ink-dim); margin-top:0; line-height:1.5;">Generates a report for the cases currently in view (respects active client/status/module filters), sorted by ID ascending.</p>
+        <div class="field">
+          <label>Page orientation</label>
+          <div style="display:flex; gap:16px; margin-top:2px;">
+            <label style="display:flex; align-items:center; gap:7px; font-size:13.5px; cursor:pointer; font-weight:500;">
+              <input type="radio" name="pdf_orientation" value="portrait" ${orientation==='portrait'?'checked':''}> Portrait
+            </label>
+            <label style="display:flex; align-items:center; gap:7px; font-size:13.5px; cursor:pointer; font-weight:500;">
+              <input type="radio" name="pdf_orientation" value="landscape" ${orientation==='landscape'?'checked':''}> Landscape
+            </label>
+          </div>
+          <div class="field-hint">Landscape gives Steps and Expected Result more room — useful for detailed cases.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closePdfExportModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmExportReportPDF()">${iconFile()} Generate PDF</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modalRoot').innerHTML = html;
+}
+
+function closePdfExportModal(){
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+function confirmExportReportPDF(){
+  const checked = document.querySelector('input[name="pdf_orientation"]:checked');
+  const orientation = checked && checked.value === 'landscape' ? 'landscape' : 'portrait';
+  settings.pdfOrientation = orientation;
+  persistSettings();
+  closePdfExportModal();
+  exportReportPDF(orientation);
+}
+
+function exportReportPDF(orientation){
+  orientation = (orientation === 'landscape') ? 'landscape' : 'portrait';
   if(!window.jspdf){ toast('PDF library did not load — check your connection', 'err'); return; }
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const doc = new jsPDF({unit:'pt', format:'a4', orientation});
   const list = filteredTasks();
+  const isLandscape = orientation === 'landscape';
 
   const marginX = 40;
   let y = 46;
@@ -1475,7 +1527,7 @@ function exportReportPDF(){
   const summaryStr = statuses.map(s=>`${s.name}: ${counts[s.id]||0}`).join('   |   ');
   doc.setFontSize(9.5);
   doc.setTextColor(60);
-  doc.text(summaryStr, marginX, y, {maxWidth: 515});
+  doc.text(summaryStr, marginX, y, {maxWidth: isLandscape ? 760 : 515});
   y += 18;
 
   const body = list.map(t=>{
@@ -1499,7 +1551,11 @@ function exportReportPDF(){
     body,
     styles:{fontSize:8, cellPadding:4, valign:'top', overflow:'linebreak'},
     headStyles:{fillColor:[52,84,209], textColor:255, fontStyle:'bold'},
-    columnStyles:{
+    columnStyles: isLandscape ? {
+      0:{cellWidth:46}, 1:{cellWidth:70}, 2:{cellWidth:70},
+      3:{cellWidth:150}, 4:{cellWidth:150}, 5:{cellWidth:140},
+      6:{cellWidth:54}, 7:{cellWidth:'auto'}
+    } : {
       0:{cellWidth:42}, 1:{cellWidth:55}, 2:{cellWidth:55},
       3:{cellWidth:95}, 4:{cellWidth:95}, 5:{cellWidth:90},
       6:{cellWidth:48}, 7:{cellWidth:'auto'}
@@ -1518,7 +1574,7 @@ function exportReportPDF(){
 
   const pdfSlug = (settings.appName || 'CaseWatch').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'casewatch';
   doc.save(`${pdfSlug}-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.pdf`);
-  toast('PDF report generated', 'ok');
+  toast(`PDF report generated (${orientation})`, 'ok');
 }
 
 function hexToRgb(hex){
