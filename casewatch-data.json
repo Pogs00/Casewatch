@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:42:13.607Z",
+  "exportedAt": "2026-08-26T06:42:57.061Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -34,13 +34,13 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-003",
       "module": "System Configuration",
-      "status": "notstarted",
+      "status": "xfejm4vlzmt9q7kox",
       "description": "Installation of menuX®",
       "steps": "",
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
       "remarks": [],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-26T05:34:51.451Z"
+      "updatedAt": "2026-08-26T06:42:27.025Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -519,7 +519,7 @@
     {
       "id": "xfejm4vlzmt9q7kox",
       "name": "In Progress",
-      "color": "#eaed0c"
+      "color": "#929405"
     }
   ]
 }
