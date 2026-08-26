@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:43:25.320Z",
+  "exportedAt": "2026-08-26T06:51:49.923Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -40,7 +40,7 @@
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
       "remarks": [],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-26T06:43:13.256Z"
+      "updatedAt": "2026-08-26T06:42:27.025Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -483,6 +483,58 @@
       "remarks": [],
       "createdAt": "2026-08-26T06:22:20.732Z",
       "updatedAt": "2026-08-26T06:22:20.732Z"
+    },
+    {
+      "id": "xlwp07drdmt9qcf60",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-035",
+      "module": "Kitchen Display",
+      "status": "notstarted",
+      "description": "Display item",
+      "steps": "1. Order from the POS sync to the KDS depending on the configuration (on the fly or afer payment)",
+      "expectedResult": "Item reflected in the KDS is correct",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:45:42.984Z",
+      "updatedAt": "2026-08-26T06:49:10.059Z"
+    },
+    {
+      "id": "x98asg2ecmt9qeuuu",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-036",
+      "module": "Kitchen Display",
+      "status": "notstarted",
+      "description": "Color coding",
+      "steps": "1. Wait for the order to determine the color-coding if working",
+      "expectedResult": "Color coding reflected properly per added time, Blue 0-5m, Yellow 5-10m, Red 10-onwards",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:47:36.630Z",
+      "updatedAt": "2026-08-26T06:49:31.728Z"
+    },
+    {
+      "id": "xez3leb74mt9qfwiw",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-037",
+      "module": "Kitchen Display",
+      "status": "notstarted",
+      "description": "Bumping",
+      "steps": "1. Touch the item in the KDS to bump",
+      "expectedResult": "Item bump properly and removed to the monitor",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:48:25.448Z",
+      "updatedAt": "2026-08-26T06:48:25.448Z"
+    },
+    {
+      "id": "xuv6dryd8mt9qjku0",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-038",
+      "module": "Kitchen Display",
+      "status": "notstarted",
+      "description": "Queue Monitor design and display",
+      "steps": "1. Validate if the logo is correct\n2. Validate if the color is correct\n3. Validate if the item once bump change from in progress to ready",
+      "expectedResult": "Order is reflected correctly, under in progress and ready",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:51:16.920Z",
+      "updatedAt": "2026-08-26T06:51:16.920Z"
     }
   ],
   "statuses": [
@@ -519,7 +571,7 @@
     {
       "id": "xfejm4vlzmt9q7kox",
       "name": "In Progress",
-      "color": "#8c8e06"
+      "color": "#929405"
     }
   ]
 }
