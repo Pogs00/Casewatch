@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:51:49.923Z",
+  "exportedAt": "2026-08-26T06:57:04.702Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -489,39 +489,39 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-035",
       "module": "Kitchen Display",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Display item",
       "steps": "1. Order from the POS sync to the KDS depending on the configuration (on the fly or afer payment)",
       "expectedResult": "Item reflected in the KDS is correct",
       "remarks": [],
       "createdAt": "2026-08-26T06:45:42.984Z",
-      "updatedAt": "2026-08-26T06:49:10.059Z"
+      "updatedAt": "2026-08-26T06:56:16.946Z"
     },
     {
       "id": "x98asg2ecmt9qeuuu",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-036",
       "module": "Kitchen Display",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Color coding",
       "steps": "1. Wait for the order to determine the color-coding if working",
       "expectedResult": "Color coding reflected properly per added time, Blue 0-5m, Yellow 5-10m, Red 10-onwards",
       "remarks": [],
       "createdAt": "2026-08-26T06:47:36.630Z",
-      "updatedAt": "2026-08-26T06:49:31.728Z"
+      "updatedAt": "2026-08-26T06:56:20.778Z"
     },
     {
       "id": "xez3leb74mt9qfwiw",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-037",
       "module": "Kitchen Display",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Bumping",
       "steps": "1. Touch the item in the KDS to bump",
       "expectedResult": "Item bump properly and removed to the monitor",
       "remarks": [],
       "createdAt": "2026-08-26T06:48:25.448Z",
-      "updatedAt": "2026-08-26T06:48:25.448Z"
+      "updatedAt": "2026-08-26T06:56:23.890Z"
     },
     {
       "id": "xuv6dryd8mt9qjku0",
@@ -535,6 +535,32 @@
       "remarks": [],
       "createdAt": "2026-08-26T06:51:16.920Z",
       "updatedAt": "2026-08-26T06:51:16.920Z"
+    },
+    {
+      "id": "x271uszewmt9qn2nv",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-039",
+      "module": "Order Point",
+      "status": "notstarted",
+      "description": "Image 800x600",
+      "steps": "1. Check the second display while in idle mode",
+      "expectedResult": "Image is reflected correctly",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:53:59.995Z",
+      "updatedAt": "2026-08-26T06:56:00.130Z"
+    },
+    {
+      "id": "xp9cj0z9lmt9qp1lr",
+      "client": "Lets Eat Rockwell Pasig",
+      "idNumber": "LE-040",
+      "module": "Order Point",
+      "status": "notstarted",
+      "description": "Image 300x600",
+      "steps": "1. Order item(s)\n2. Check the second display",
+      "expectedResult": "Image reflected correctly",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:55:31.935Z",
+      "updatedAt": "2026-08-26T06:55:41.494Z"
     }
   ],
   "statuses": [
@@ -572,6 +598,11 @@
       "id": "xfejm4vlzmt9q7kox",
       "name": "In Progress",
       "color": "#929405"
+    },
+    {
+      "id": "xvir2m0zamt9qqvzd",
+      "name": "Not Applicable",
+      "color": "#0CA678"
     }
   ]
 }
