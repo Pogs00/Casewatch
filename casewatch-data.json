@@ -1,33 +1,33 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:38:44.344Z",
+  "exportedAt": "2026-08-26T06:42:13.607Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-001",
       "module": "System Configuration",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Installation of Aloha",
       "steps": "",
       "expectedResult": "Working Aloha POS",
       "remarks": [],
       "createdAt": "2026-08-26T05:24:12.621Z",
-      "updatedAt": "2026-08-26T05:39:58.431Z"
+      "updatedAt": "2026-08-26T06:41:27.980Z"
     },
     {
       "id": "x3vugygvzmt9ngi0c",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-002",
       "module": "System Configuration",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Installation of KDS",
       "steps": "",
       "expectedResult": "Working KDS, Order from POS is sending correctly",
       "remarks": [],
       "createdAt": "2026-08-26T05:24:54.444Z",
-      "updatedAt": "2026-08-26T05:34:46.243Z"
+      "updatedAt": "2026-08-26T06:41:32.009Z"
     },
     {
       "id": "xmrosq2dxmt9nhxdc",
@@ -515,6 +515,11 @@
       "id": "notstarted",
       "name": "Not Started",
       "color": "#495057"
+    },
+    {
+      "id": "xfejm4vlzmt9q7kox",
+      "name": "In Progress",
+      "color": "#eaed0c"
     }
   ]
 }
