@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CaseWatch — Test Case Monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --bg: #eef1f6;
+    --panel: #ffffff;
+    --panel-2: #f6f8fb;
+    --ink: #1b2430;
+    --ink-dim: #5b6472;
+    --ink-faint: #8a93a1;
+    --line: #dfe4ec;
+    --accent: #3454d1;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8ecfb;
+    --danger: #e03131;
+    --danger-soft: #fdecec;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(23,32,52,.04), 0 8px 24px -12px rgba(23,32,52,.12);
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --disp: 'Space Grotesk', ui-sans-serif, sans-serif;
+    --body: 'Inter', ui-sans-serif, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  input,select,textarea{font-family:inherit; font-size:14px;}
+  ::selection{background:var(--accent-soft);}
+
+  /* ---------- Layout ---------- */
+  #app{display:grid; grid-template-columns:248px 1fr; height:100vh;}
+  .sidebar{
+    background:#161b2e; color:#d7dcec; display:flex; flex-direction:column;
+    padding:18px 14px; gap:18px; overflow-y:auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:2px 6px 10px;}
+  .brand-mark{
+    width:30px; height:30px; border-radius:8px; flex:none;
+    background:linear-gradient(135deg, #4c6aef, #7048e8);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
+  }
+  .brand-mark svg{width:16px;height:16px;}
+  .brand-name{font-family:var(--disp); font-weight:700; font-size:16.5px; color:#fff; letter-spacing:.2px;}
+  .brand-sub{font-size:10.5px; color:#8890ab; margin-top:-1px; letter-spacing:.5px; text-transform:uppercase;}
+
+  .nav-group{display:flex; flex-direction:column; gap:2px;}
+  .nav-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.8px; color:#666f8d; padding:8px 10px 4px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+    color:#c2c8de; cursor:pointer; font-size:13.5px; font-weight:500; border:none; background:none; text-align:left; width:100%;
+  }
+  .nav-item svg{width:16px;height:16px; flex:none; opacity:.85;}
+  .nav-item:hover{background:#20263d; color:#fff;}
+  .nav-item.active{background:#2a3a7c; color:#fff;}
+
+  .client-list{display:flex; flex-direction:column; gap:2px; max-height:280px; overflow-y:auto;}
+  .client-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:8px 10px; border-radius:8px; color:#c2c8de; cursor:pointer; font-size:13px; border:none; background:none; width:100%; text-align:left;
+  }
+  .client-item:hover{background:#20263d; color:#fff;}
+  .client-item.active{background:#242d4d; color:#fff; font-weight:600;}
+  .client-count{
+    font-family:var(--mono); font-size:10.5px; color:#9099b8; background:#0f1424; border-radius:20px; padding:1px 7px;
+  }
+  .client-item.active .client-count{color:#cfd6ff; background:#1c2650;}
+
+  .sidebar-foot{margin-top:auto; padding-top:10px; border-top:1px solid #262c46; font-size:11px; color:#666f8d;}
+
+  .main{overflow-y:auto; display:flex; flex-direction:column;}
+  .topbar{
+    position:sticky; top:0; z-index:5; background:rgba(238,241,246,.88); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px 26px; border-bottom:1px solid var(--line);
+  }
+  .topbar h1{font-family:var(--disp); font-size:19px; margin:0; font-weight:700;}
+  .topbar .sub{font-size:12.5px; color:var(--ink-dim); margin-top:2px;}
+  .topbar-actions{display:flex; gap:8px; align-items:center;}
+
+  .content{padding:22px 26px 60px;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); background:var(--panel);
+    color:var(--ink); padding:8px 13px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+    transition:background .12s, border-color .12s;
+  }
+  .btn svg{width:14px; height:14px;}
+  .btn:hover{background:var(--panel-2); border-color:#c9d1e0;}
+  .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .btn-primary:hover{background:#2c46b8;}
+  .btn-danger{color:var(--danger); border-color:#f3caca;}
+  .btn-danger:hover{background:var(--danger-soft);}
+  .btn-ghost{border-color:transparent; background:transparent;}
+  .btn-ghost:hover{background:var(--panel-2);}
+  .btn-sm{padding:5px 9px; font-size:12px; border-radius:7px;}
+  .btn[disabled]{opacity:.5; cursor:not-allowed;}
+  .icon-btn{
+    width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center;
+    border-radius:7px; border:1px solid var(--line); background:var(--panel); cursor:pointer; color:var(--ink-dim);
+  }
+  .icon-btn:hover{background:var(--panel-2); color:var(--ink);}
+  .icon-btn svg{width:14px; height:14px;}
+
+  /* ---------- Dashboard ---------- */
+  .dash-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;}
+  .dash-head h2{font-family:var(--disp); font-size:15px; margin:0;}
+
+  .signal-strip{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;
+    box-shadow:var(--shadow); margin-bottom:20px;
+  }
+  .signal-strip-top{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;}
+  .signal-title{font-family:var(--disp); font-weight:700; font-size:14px;}
+  .signal-total{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+  .signal-track{display:flex; height:14px; border-radius:99px; overflow:hidden; background:var(--panel-2); border:1px solid var(--line);}
+  .signal-seg{height:100%; transition:width .25s ease;}
+  .signal-legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px;}
+  .signal-legend-item{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-dim);}
+  .legend-dot{width:9px; height:9px; border-radius:3px; flex:none;}
+  .legend-count{font-family:var(--mono); color:var(--ink); font-weight:600;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; margin-bottom:20px;}
+  .stat-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;
+    box-shadow:var(--shadow); cursor:pointer; transition:border-color .12s, transform .08s;
+  }
+  .stat-card:hover{border-color:#b9c3d9; transform:translateY(-1px);}
+  .stat-card.active{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft);}
+  .stat-num{font-family:var(--disp); font-size:24px; font-weight:700; line-height:1;}
+  .stat-label{font-size:11.5px; color:var(--ink-dim); margin-top:6px; display:flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:.4px;}
+
+  .panel-block{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);}
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px;
+  }
+  .filter-bar input[type=text], .filter-bar select{
+    padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--panel); color:var(--ink);
+  }
+  .search-wrap{position:relative; flex:1; min-width:180px;}
+  .search-wrap svg{position:absolute; left:9px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint);}
+  .search-wrap input{width:100%; padding-left:30px;}
+  .filter-spacer{flex:1;}
+
+  /* ---------- Table ---------- */
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-faint);
+    padding:10px 14px; border-bottom:1px solid var(--line); font-weight:700; white-space:nowrap;
+  }
+  tbody td{padding:11px 14px; border-bottom:1px solid #eceff5; vertical-align:top;}
+  tbody tr{cursor:pointer;}
+  tbody tr:hover{background:var(--panel-2);}
+  .cell-id{font-family:var(--mono); font-weight:600; color:var(--ink);}
+  .cell-desc{color:var(--ink-dim); max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cell-client{color:var(--ink-dim);}
+  .badge{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:4px 9px;
+    border-radius:99px; white-space:nowrap;
+  }
+  .badge-dot{width:6px; height:6px; border-radius:50%; flex:none;}
+  .row-actions{display:flex; gap:5px; justify-content:flex-end;}
+  .empty-state{padding:60px 20px; text-align:center; color:var(--ink-dim);}
+  .empty-state svg{width:36px; height:36px; color:var(--ink-faint); margin-bottom:10px;}
+  .empty-state h3{font-family:var(--disp); font-size:15px; margin:0 0 4px; color:var(--ink);}
+  .empty-state p{font-size:13px; margin:0 0 14px;}
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(15,20,36,.5); display:flex; align-items:center; justify-content:center;
+    z-index:50; padding:24px; backdrop-filter:blur(2px);
+  }
+  .modal{
+    background:var(--panel); border-radius:14px; width:100%; max-width:640px; max-height:88vh; overflow-y:auto;
+    box-shadow:0 20px 60px -12px rgba(10,15,30,.35);
+  }
+  .modal.modal-lg{max-width:760px;}
+  .modal.modal-sm{max-width:460px;}
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:var(--panel); z-index:2;
+  }
+  .modal-head h2{font-family:var(--disp); font-size:16px; margin:0;}
+  .modal-body{padding:20px 22px;}
+  .modal-foot{
+    display:flex; justify-content:flex-end; gap:8px; padding:16px 22px; border-top:1px solid var(--line);
+    position:sticky; bottom:0; background:var(--panel);
+  }
+  .field{margin-bottom:15px;}
+  .field label{display:block; font-size:12px; font-weight:600; color:var(--ink-dim); margin-bottom:5px;}
+  .field input[type=text], .field input[type=password], .field select, .field textarea{
+    width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px; background:var(--panel-2); color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none; border-color:var(--accent); background:var(--panel); box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .field textarea{resize:vertical; min-height:70px; line-height:1.5;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .field-hint{font-size:11.5px; color:var(--ink-faint); margin-top:4px;}
+  .datalist-note{font-family:var(--mono);}
+
+  /* remarks */
+  .remarks-list{display:flex; flex-direction:column; gap:8px; margin-bottom:10px; max-height:200px; overflow-y:auto;}
+  .remark-item{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+    display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+  }
+  .remark-text{font-size:13px; color:var(--ink); white-space:pre-wrap; line-height:1.45;}
+  .remark-time{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:4px; white-space:nowrap;}
+  .remark-add{display:flex; gap:8px; align-items:flex-start;}
+  .remark-add textarea{flex:1; min-height:44px;}
+  .no-remarks{font-size:12.5px; color:var(--ink-faint); padding:8px 0;}
+
+  /* status manager */
+  .status-row{
+    display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #eceff5;
+  }
+  .status-row:last-child{border-bottom:none;}
+  .color-swatch{width:28px; height:28px; border-radius:8px; border:1px solid rgba(0,0,0,.08); flex:none; cursor:pointer; padding:0;}
+  .status-row input[type=text]{flex:1; padding:7px 9px; border:1px solid var(--line); border-radius:7px; background:var(--panel-2);}
+  .status-usage{font-size:11px; color:var(--ink-faint); font-family:var(--mono); white-space:nowrap;}
+
+  /* settings / sync */
+  .sync-section{margin-bottom:22px;}
+  .sync-section h3{font-family:var(--disp); font-size:13.5px; margin:0 0 4px;}
+  .sync-section p.desc{font-size:12.5px; color:var(--ink-dim); margin:0 0 12px;}
+  .sync-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .status-msg{font-size:12.5px; padding:9px 11px; border-radius:8px; margin-top:10px;}
+  .status-msg.ok{background:#e9f7ee; color:#1c7a3c;}
+  .status-msg.err{background:var(--danger-soft); color:var(--danger);}
+  .status-msg.info{background:var(--accent-soft); color:var(--accent);}
+
+  .toast-wrap{position:fixed; bottom:20px; right:20px; z-index:100; display:flex; flex-direction:column; gap:8px;}
+  .toast{
+    background:#1b2430; color:#fff; padding:11px 16px; border-radius:9px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    display:flex; align-items:center; gap:8px; animation:toast-in .18s ease;
+  }
+  .toast.err{background:#7f1d1d;}
+  .toast.ok{background:#14532d;}
+  @keyframes toast-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  ::-webkit-scrollbar{width:9px; height:9px;}
+  ::-webkit-scrollbar-thumb{background:#c7cedd; border-radius:20px;}
+  .sidebar ::-webkit-scrollbar-thumb{background:#333c5c;}
+
+  select.status-color-select{width:38px; padding:2px; border:none; background:none;}
+
+  .menu-toggle{display:none; width:34px; height:34px; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--line); background:var(--panel); cursor:pointer; color:var(--ink); flex:none;}
+  .menu-toggle svg{width:18px; height:18px;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(10,14,26,.45); z-index:39;}
+  .sidebar-backdrop.open{display:block;}
+
+  @media (max-width: 840px){
+    #app{grid-template-columns:1fr;}
+    .sidebar{
+      display:flex; position:fixed; top:0; left:0; bottom:0; width:260px; z-index:40;
+      transform:translateX(-104%); transition:transform .2s ease; box-shadow:12px 0 30px rgba(0,0,0,.25);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:inline-flex;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"></polyline></svg></div>
+      <div>
+        <div class="brand-name">CaseWatch</div>
+        <div class="brand-sub">Test Monitoring</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button class="nav-item" data-view="dashboard" onclick="setView('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="cases" onclick="setView('cases')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1z"/><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 12h6M9 16h6"/></svg>
+        Test Cases
+      </button>
+      <button class="nav-item" data-view="statuses" onclick="setView('statuses')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        Manage Statuses
+      </button>
+      <button class="nav-item" data-view="sync" onclick="setView('sync')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        Save &amp; Sync
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label" style="display:flex; justify-content:space-between; align-items:center; padding-right:2px;">
+        <span>Clients</span>
+        <button class="icon-btn" title="Add client" onclick="promptAddClient()" style="width:22px; height:22px; background:transparent; border-color:#333c5c; color:#c2c8de;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <div class="client-list" id="clientList"></div>
+    </div>
+
+    <div class="sidebar-foot" id="sidebarFoot">All data stored locally in this browser.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" onclick="toggleSidebar()" title="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="sub" id="pageSub">Overview of test case health</div>
+        </div>
+      </div>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+
+<div id="modalRoot"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =========================================================
+   STATE & PERSISTENCE
+   ========================================================= */
+const LS_TASKS = 'casewatch_tasks_v1';
+const LS_STATUSES = 'casewatch_statuses_v1';
+const LS_SETTINGS = 'casewatch_settings_v1';
+
+const DEFAULT_STATUSES = [
+  {id:'passed',     name:'Passed',            color:'#2F9E44'},
+  {id:'failed',      name:'Failed',            color:'#E03131'},
+  {id:'retest',       name:'Re-test',           color:'#F08C00'},
+  {id:'onhold',      name:'On Hold',           color:'#868E96'},
+  {id:'confirm',     name:'For Confirmation',  color:'#7048E8'},
+  {id:'notstarted',  name:'Not Started',       color:'#495057'},
+];
+
+function uid(){ return 'x' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    return JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+function saveJSON(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ console.error('save failed', e); }
+}
+
+let tasks = loadJSON(LS_TASKS, sampleTasks());
+let statuses = loadJSON(LS_STATUSES, DEFAULT_STATUSES);
+let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json'});
+const LS_CLIENTS = 'casewatch_clients_v1';
+let extraClients = loadJSON(LS_CLIENTS, []); // clients added manually before they have any test cases
+function persistClients(){ saveJSON(LS_CLIENTS, extraClients); }
+
+function sampleTasks(){
+  const now = new Date().toISOString();
+  return [
+    {id:uid(), client:'Acme Corp', idNumber:'TC-001', module:'Login', description:'Verify user can log in with valid credentials', steps:'1. Go to login page\n2. Enter valid username/password\n3. Click Login', expectedResult:'User is redirected to dashboard', status:'passed', remarks:[{id:uid(), text:'Verified on staging build 1.2.0', ts:now}], createdAt:now, updatedAt:now},
+    {id:uid(), client:'Acme Corp', idNumber:'TC-002', module:'Login', description:'Verify error message on invalid password', steps:'1. Go to login page\n2. Enter valid username, wrong password\n3. Click Login', expectedResult:'Error message "Invalid credentials" is shown', status:'failed', remarks:[{id:uid(), text:'Error message not shown, blank screen instead', ts:now}], createdAt:now, updatedAt:now},
+    {id:uid(), client:'Globex Inc', idNumber:'TC-001', module:'Checkout', description:'Verify total updates when quantity changes', steps:'1. Add item to cart\n2. Increase quantity to 3', expectedResult:'Total price recalculates correctly', status:'notstarted', remarks:[], createdAt:now, updatedAt:now},
+  ];
+}
+
+function persistTasks(){ saveJSON(LS_TASKS, tasks); }
+function persistStatuses(){ saveJSON(LS_STATUSES, statuses); }
+function persistSettings(){ saveJSON(LS_SETTINGS, settings); }
+
+/* =========================================================
+   APP STATE (view/filters)
+   ========================================================= */
+let view = 'dashboard';
+let currentClient = '__ALL__';
+let filterStatus = '__ALL__';
+let filterModule = '__ALL__';
+let searchTerm = '';
+
+function naturalCompare(a,b){
+  return String(a).localeCompare(String(b), undefined, {numeric:true, sensitivity:'base'});
+}
+
+function nextIdForClient(client){
+  if(!client) return '';
+  const clientTasks = tasks.filter(t => (t.client||'').toLowerCase() === client.toLowerCase());
+  if(clientTasks.length === 0) return 'TC-001';
+  let best = null; // {prefix, num, pad}
+  clientTasks.forEach(t=>{
+    const m = String(t.idNumber||'').match(/^(.*?)(\d+)(\D*)$/);
+    if(!m) return;
+    const num = parseInt(m[2], 10);
+    if(!best || num > best.num){
+      best = {prefix:m[1], num, pad:m[2].length, suffix:m[3]};
+    }
+  });
+  if(!best) return 'TC-001';
+  const nextNum = best.num + 1;
+  return best.prefix + String(nextNum).padStart(best.pad, '0') + best.suffix;
+}
+
+function statusById(id){ return statuses.find(s=>s.id===id) || {id:'unknown', name:'Unknown', color:'#999'}; }
+
+function getClientList(){
+  const set = new Set(tasks.map(t=>t.client).filter(Boolean));
+  extraClients.forEach(c=>set.add(c));
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+function moduleList(scopeTasks){
+  const set = new Set(scopeTasks.map(t=>t.module).filter(Boolean));
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+
+function scopedTasks(){
+  let list = tasks.slice();
+  if(currentClient !== '__ALL__') list = list.filter(t=>t.client === currentClient);
+  return list;
+}
+
+function filteredTasks(){
+  let list = scopedTasks();
+  if(filterStatus !== '__ALL__') list = list.filter(t=>t.status === filterStatus);
+  if(filterModule !== '__ALL__') list = list.filter(t=>t.module === filterModule);
+  if(searchTerm.trim()){
+    const q = searchTerm.trim().toLowerCase();
+    list = list.filter(t =>
+      (t.idNumber||'').toLowerCase().includes(q) ||
+      (t.module||'').toLowerCase().includes(q) ||
+      (t.description||'').toLowerCase().includes(q) ||
+      (t.client||'').toLowerCase().includes(q)
+    );
+  }
+  list.sort((a,b)=> naturalCompare(a.idNumber, b.idNumber));
+  return list;
+}
+
+/* =========================================================
+   TOASTS
+   ========================================================= */
+function toast(msg, kind){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast' + (kind ? ' '+kind : '');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .25s'; setTimeout(()=>el.remove(), 250); }, 2600);
+}
+
+/* =========================================================
+   NAV / VIEW ROUTING
+   ========================================================= */
+function setView(v){
+  view = v;
+  document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.view === v);
+  });
+  render();
+  if(window.innerWidth <= 840) toggleSidebar(false);
+}
+
+function toggleSidebar(force){
+  const sb = document.querySelector('.sidebar');
+  const bd = document.getElementById('sidebarBackdrop');
+  if(!sb || !bd) return;
+  const next = typeof force === 'boolean' ? force : !sb.classList.contains('open');
+  sb.classList.toggle('open', next);
+  bd.classList.toggle('open', next);
+}
+
+function selectClient(name){
+  currentClient = name;
+  // Clear filters left over from a previous client/status — otherwise a stale
+  // status/module/search filter can hide every case for the newly selected
+  // client, which looks exactly like the click "did nothing".
+  filterStatus = '__ALL__';
+  filterModule = '__ALL__';
+  searchTerm = '';
+  // Manage Statuses and Save & Sync aren't client-scoped, so stay put there;
+  // any other view (including Dashboard) jumps to the Test Cases list so the
+  // selection is immediately visible.
+  const nextView = (view === 'sync' || view === 'statuses') ? view : 'cases';
+  setView(nextView);
+}
+
+function promptAddClient(){
+  const name = prompt('New client name:');
+  if(!name || !name.trim()) return;
+  const trimmed = name.trim();
+  const exists = getClientList().some(c => c.toLowerCase() === trimmed.toLowerCase());
+  if(exists){
+    toast('That client already exists', 'err');
+    selectClient(trimmed);
+    return;
+  }
+  extraClients.push(trimmed);
+  persistClients();
+  toast('Client added — add a test case to get started', 'ok');
+  selectClient(trimmed);
+}
+
+/* =========================================================
+   RENDER: SIDEBAR CLIENTS
+   ========================================================= */
+function renderSidebarClients(){
+  const wrap = document.getElementById('clientList');
+  const clients = getClientList();
+  let html = '';
+  const allCount = tasks.length;
+  html += `<button class="client-item ${currentClient==='__ALL__'?'active':''}" onclick="selectClient('__ALL__')">
+    <span>All Clients</span><span class="client-count">${allCount}</span>
+  </button>`;
+  clients.forEach(c=>{
+    const count = tasks.filter(t=>t.client===c).length;
+    html += `<button class="client-item ${currentClient===c?'active':''}" onclick="selectClient('${escAttr(c)}')">
+      <span>${escHtml(c)}</span><span class="client-count">${count}</span>
+    </button>`;
+  });
+  if(clients.length===0){
+    html += `<div style="font-size:12px;color:#666f8d;padding:8px 10px;">No clients yet — tap + above or add a test case to get started.</div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+/* =========================================================
+   UTIL: escaping
+   ========================================================= */
+function escHtml(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escAttr(str){ return escHtml(str).replace(/`/g,'&#96;'); }
+function nl2br(str){ return escHtml(str).replace(/\n/g,'<br>'); }
+
+function formatDateTime(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString(undefined, {year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+  }catch(e){ return iso; }
+}
+
+/* =========================================================
+   RENDER: MAIN ROUTER
+   ========================================================= */
+function render(){
+  renderSidebarClients();
+  const title = document.getElementById('pageTitle');
+  const sub = document.getElementById('pageSub');
+  const actions = document.getElementById('topbarActions');
+  const content = document.getElementById('content');
+
+  const scopeLabel = currentClient === '__ALL__' ? 'All clients' : currentClient;
+
+  if(view === 'dashboard'){
+    title.textContent = 'Dashboard';
+    sub.textContent = scopeLabel + ' · status overview';
+    actions.innerHTML = `
+      <button class="btn" onclick="setView('cases')">${iconList()} View test cases</button>
+      <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
+    `;
+    content.innerHTML = renderDashboard();
+  } else if(view === 'cases'){
+    title.textContent = 'Test Cases';
+    sub.textContent = scopeLabel + ' · sorted by ID ascending';
+    actions.innerHTML = `
+      <button class="btn" onclick="exportReportPDF()">${iconFile()} Export PDF</button>
+      <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
+    `;
+    content.innerHTML = renderCasesView();
+  } else if(view === 'statuses'){
+    title.textContent = 'Manage Statuses';
+    sub.textContent = 'Add, rename, recolor or remove status labels';
+    actions.innerHTML = `<button class="btn btn-primary" onclick="addStatus()">${iconPlus()} New status</button>`;
+    content.innerHTML = renderStatusManager();
+  } else if(view === 'sync'){
+    title.textContent = 'Save & Sync';
+    sub.textContent = 'Local file export/import and GitHub backup';
+    actions.innerHTML = '';
+    content.innerHTML = renderSyncView();
+  }
+}
+
+/* =========================================================
+   ICONS (inline svg strings)
+   ========================================================= */
+function iconPlus(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`; }
+function iconList(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`; }
+function iconFile(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>`; }
+function iconEdit(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`; }
+function iconTrash(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`; }
+function iconSearch(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`; }
+function iconDownload(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>`; }
+function iconUpload(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>`; }
+function iconGithub(){ return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.57.1.79-.25.79-.55v-2.1c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.68-1.29-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.66.8.55A10.52 10.52 0 0 0 23.5 12c0-6.35-5.15-11.5-11.5-11.5Z"/></svg>`; }
+function iconCheck(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`; }
+function iconFolder(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>`; }
+function iconInbox(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg>`; }
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+function renderDashboard(){
+  const list = scopedTasks();
+  const total = list.length;
+
+  const counts = {};
+  statuses.forEach(s=>counts[s.id]=0);
+  list.forEach(t=>{ counts[t.status] = (counts[t.status]||0) + 1; });
+
+  let segHtml = '';
+  let legendHtml = '';
+  statuses.forEach(s=>{
+    const c = counts[s.id]||0;
+    const pct = total ? (c/total*100) : 0;
+    if(pct>0) segHtml += `<div class="signal-seg" style="width:${pct}%; background:${s.color}" title="${escAttr(s.name)}: ${c}"></div>`;
+    legendHtml += `<div class="signal-legend-item"><span class="legend-dot" style="background:${s.color}"></span>${escHtml(s.name)} <span class="legend-count">${c}</span></div>`;
+  });
+  if(total===0){ segHtml = `<div class="signal-seg" style="width:100%; background:#e3e7ef"></div>`; }
+
+  const passedCount = counts['passed'] !== undefined ? counts['passed'] : 0;
+  const failedCount = counts['failed'] !== undefined ? counts['failed'] : 0;
+  const passRate = total ? Math.round((passedCount/total)*100) : 0;
+
+  let statCards = `
+    <div class="stat-card ${filterStatus==='__ALL__'?'active':''}" onclick="goToCasesWithStatus('__ALL__')">
+      <div class="stat-num">${total}</div>
+      <div class="stat-label">Total test cases</div>
+    </div>
+    <div class="stat-card" onclick="goToCasesWithStatus('__ALL__')" style="cursor:default">
+      <div class="stat-num">${passRate}%</div>
+      <div class="stat-label">Pass rate</div>
+    </div>
+  `;
+  statuses.forEach(s=>{
+    const c = counts[s.id]||0;
+    statCards += `
+      <div class="stat-card" onclick="goToCasesWithStatus('${escAttr(s.id)}')">
+        <div class="stat-num" style="color:${s.color}">${c}</div>
+        <div class="stat-label"><span class="legend-dot" style="background:${s.color}"></span>${escHtml(s.name)}</div>
+      </div>
+    `;
+  });
+
+  const modules = moduleList(list);
+  let moduleRows = '';
+  modules.forEach(m=>{
+    const mTasks = list.filter(t=>t.module===m);
+    const mPassed = mTasks.filter(t=>t.status==='passed').length;
+    const sharePct = total ? Math.round((mTasks.length/total)*100) : 0;
+    const passPct = mTasks.length ? Math.round((mPassed/mTasks.length)*100) : 0;
+    moduleRows += `<tr>
+      <td style="font-weight:600; white-space:nowrap;">${escHtml(m)}</td>
+      <td class="cell-desc" style="max-width:none; white-space:nowrap;">${mTasks.length} case${mTasks.length!==1?'s':''}</td>
+      <td style="white-space:nowrap;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+            <div style="width:${sharePct}%; height:100%; background:var(--accent);"></div>
+          </div>
+          <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${sharePct}% of total</span>
+        </div>
+      </td>
+      <td style="white-space:nowrap;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+            <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
+          </div>
+          <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${mPassed}/${mTasks.length} passed (${passPct}%)</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+  const moduleTable = modules.length ? `
+    <div class="panel-block" style="margin-top:20px; padding:4px 0;">
+      <div style="padding:14px 20px 6px;"><div class="dash-head" style="margin-bottom:0;"><h2>By module</h2></div></div>
+      <table>
+        <thead><tr><th>Module</th><th>Test cases</th><th>Share of total</th><th>Pass rate</th></tr></thead>
+        <tbody>${moduleRows}</tbody>
+      </table>
+    </div>
+  ` : '';
+
+  return `
+    <div class="signal-strip">
+      <div class="signal-strip-top">
+        <div class="signal-title">Signal strip</div>
+        <div class="signal-total">${total} case${total!==1?'s':''} tracked</div>
+      </div>
+      <div class="signal-track">${segHtml}</div>
+      <div class="signal-legend">${legendHtml}</div>
+    </div>
+    <div class="stat-grid">${statCards}</div>
+    ${moduleTable}
+  `;
+}
+
+function goToCasesWithStatus(statusId){
+  filterStatus = statusId;
+  filterModule = '__ALL__';
+  searchTerm = '';
+  setView('cases');
+}
+
+/* =========================================================
+   CASES VIEW (table)
+   ========================================================= */
+function renderCasesView(){
+  const list = filteredTasks();
+  const modules = moduleList(scopedTasks());
+
+  let statusOptions = `<option value="__ALL__">All statuses</option>`;
+  statuses.forEach(s=> statusOptions += `<option value="${escAttr(s.id)}" ${filterStatus===s.id?'selected':''}>${escHtml(s.name)}</option>`);
+
+  let moduleOptions = `<option value="__ALL__">All modules</option>`;
+  modules.forEach(m=> moduleOptions += `<option value="${escAttr(m)}" ${filterModule===m?'selected':''}>${escHtml(m)}</option>`);
+
+  let rows = '';
+  if(list.length === 0){
+    rows = `<tr><td colspan="6"><div class="empty-state">
+      ${iconInbox()}
+      <h3>No test cases found</h3>
+      <p>Try clearing filters, or add a new test case.</p>
+      <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
+    </div></td></tr>`;
+  } else {
+    list.forEach(t=>{
+      const st = statusById(t.status);
+      const lastRemark = t.remarks && t.remarks.length ? t.remarks[t.remarks.length-1] : null;
+      rows += `<tr onclick="openTaskModal('${t.id}')">
+        <td class="cell-id">${escHtml(t.idNumber)}</td>
+        ${currentClient==='__ALL__' ? `<td class="cell-client">${escHtml(t.client)}</td>` : ''}
+        <td>${escHtml(t.module)}</td>
+        <td class="cell-desc" title="${escAttr(t.description)}">${escHtml(t.description)}</td>
+        <td><span class="badge" style="background:${st.color}22; color:${st.color}"><span class="badge-dot" style="background:${st.color}"></span>${escHtml(st.name)}</span></td>
+        <td style="font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); white-space:nowrap;">${lastRemark ? formatDateTime(lastRemark.ts) : '—'}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="row-actions">
+            <button class="icon-btn" title="Edit" onclick="openTaskModal('${t.id}')">${iconEdit()}</button>
+            <button class="icon-btn" title="Delete" onclick="deleteTask('${t.id}')">${iconTrash()}</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+  }
+
+  return `
+    <div class="filter-bar">
+      <div class="search-wrap">
+        ${iconSearch()}
+        <input type="text" id="searchInput" placeholder="Search ID, module, description, client…" value="${escAttr(searchTerm)}" oninput="onSearchInput(this.value)">
+      </div>
+      <select onchange="filterStatus=this.value; render();">${statusOptions}</select>
+      <select onchange="filterModule=this.value; render();">${moduleOptions}</select>
+      <div class="filter-spacer"></div>
+      <span style="font-size:12px; color:var(--ink-dim);">${list.length} shown</span>
+    </div>
+    <div class="panel-block">
+      <table>
+        <thead><tr>
+          <th>ID Number</th>
+          ${currentClient==='__ALL__' ? '<th>Client</th>' : ''}
+          <th>Module</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Last remark</th>
+          <th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+let searchDebounce = null;
+function onSearchInput(val){
+  searchTerm = val;
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(()=>{ render(); focusSearch(); }, 180);
+}
+function focusSearch(){
+  const el = document.getElementById('searchInput');
+  if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+}
+
+function deleteTask(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(!confirm(`Delete test case "${t.idNumber} — ${t.module}"? This cannot be undone.`)) return;
+  tasks = tasks.filter(x=>x.id!==id);
+  persistTasks();
+  toast('Test case deleted', 'ok');
+  render();
+}
+
+/* =========================================================
+   TASK MODAL (add/edit)
+   ========================================================= */
+let editingTaskId = null;
+let draftRemarks = [];
+let idAutoFilled = false;
+
+function openTaskModal(id){
+  editingTaskId = id || null;
+  const t = id ? tasks.find(x=>x.id===id) : null;
+  draftRemarks = t ? JSON.parse(JSON.stringify(t.remarks||[])) : [];
+
+  const clients = getClientList();
+  const modules = Array.from(new Set(tasks.map(x=>x.module).filter(Boolean)));
+
+  let statusOptions = '';
+  statuses.forEach(s=> statusOptions += `<option value="${escAttr(s.id)}" ${t && t.status===s.id ? 'selected':''}>${escHtml(s.name)}</option>`);
+
+  const defaultClient = t ? t.client : (currentClient !== '__ALL__' ? currentClient : '');
+  idAutoFilled = !t; // only auto-fill for new test cases, never when editing
+  const defaultId = t ? t.idNumber : (defaultClient ? nextIdForClient(defaultClient) : '');
+
+  const html = `
+  <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal modal-lg">
+      <div class="modal-head">
+        <h2>${t ? 'Edit test case' : 'Add test case'}</h2>
+        <button class="icon-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Client</label>
+            <input type="text" id="f_client" list="clientOptions" value="${escAttr(defaultClient)}" placeholder="e.g. Acme Corp" oninput="onClientFieldInput(this.value)">
+            <datalist id="clientOptions">${clients.map(c=>`<option value="${escAttr(c)}">`).join('')}</datalist>
+          </div>
+          <div class="field">
+            <label>ID Number</label>
+            <input type="text" id="f_id" value="${escAttr(defaultId)}" placeholder="e.g. TC-001" oninput="idAutoFilled=false">
+            <div class="field-hint">Auto-fills as the next number for this client — edit it any time.</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Module</label>
+            <input type="text" id="f_module" list="moduleOptions" value="${t?escAttr(t.module):''}" placeholder="e.g. Login">
+            <datalist id="moduleOptions">${modules.map(m=>`<option value="${escAttr(m)}">`).join('')}</datalist>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="f_status">${statusOptions}</select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="f_description" placeholder="What is this test case verifying?">${t?escHtml(t.description):''}</textarea>
+        </div>
+        <div class="field">
+          <label>Steps</label>
+          <textarea id="f_steps" placeholder="1. Step one&#10;2. Step two">${t?escHtml(t.steps):''}</textarea>
+        </div>
+        <div class="field">
+          <label>Expected Result</label>
+          <textarea id="f_expected" placeholder="What should happen?">${t?escHtml(t.expectedResult):''}</textarea>
+        </div>
+        <div class="field">
+          <label>Remarks</label>
+          <div class="remarks-list" id="remarksList"></div>
+          <div class="remark-add">
+            <textarea id="f_newRemark" placeholder="Add a remark… (date & time will be stamped automatically)"></textarea>
+            <button class="btn btn-sm" onclick="addDraftRemark()">${iconPlus()} Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        ${t ? `<button class="btn btn-danger" style="margin-right:auto" onclick="deleteTask('${t.id}'); closeModal();">${iconTrash()} Delete</button>` : ''}
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTask()">${iconCheck()} Save test case</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modalRoot').innerHTML = html;
+  renderDraftRemarks();
+}
+
+function renderDraftRemarks(){
+  const wrap = document.getElementById('remarksList');
+  if(!wrap) return;
+  if(draftRemarks.length === 0){
+    wrap.innerHTML = `<div class="no-remarks">No remarks yet.</div>`;
+    return;
+  }
+  const sorted = draftRemarks.slice().sort((a,b)=> new Date(b.ts) - new Date(a.ts));
+  wrap.innerHTML = sorted.map(r => `
+    <div class="remark-item">
+      <div>
+        <div class="remark-text">${nl2br(r.text)}</div>
+        <div class="remark-time">${formatDateTime(r.ts)}</div>
+      </div>
+      <button class="icon-btn" title="Remove remark" onclick="removeDraftRemark('${r.id}')">${iconTrash()}</button>
+    </div>
+  `).join('');
+}
+
+function addDraftRemark(){
+  const ta = document.getElementById('f_newRemark');
+  const text = ta.value.trim();
+  if(!text) return;
+  draftRemarks.push({id:uid(), text, ts:new Date().toISOString()});
+  ta.value = '';
+  renderDraftRemarks();
+}
+function removeDraftRemark(id){
+  draftRemarks = draftRemarks.filter(r=>r.id!==id);
+  renderDraftRemarks();
+}
+
+function onClientFieldInput(val){
+  if(editingTaskId) return; // never touch ID Number when editing an existing case
+  if(!idAutoFilled) return; // user already typed a custom ID — leave it alone
+  const idField = document.getElementById('f_id');
+  if(!idField) return;
+  const trimmed = val.trim();
+  idField.value = trimmed ? nextIdForClient(trimmed) : '';
+}
+
+function closeModal(){
+  document.getElementById('modalRoot').innerHTML = '';
+  editingTaskId = null;
+}
+
+function saveTask(){
+  const client = document.getElementById('f_client').value.trim();
+  const idNumber = document.getElementById('f_id').value.trim();
+  const module = document.getElementById('f_module').value.trim();
+  const status = document.getElementById('f_status').value;
+  const description = document.getElementById('f_description').value.trim();
+  const steps = document.getElementById('f_steps').value.trim();
+  const expectedResult = document.getElementById('f_expected').value.trim();
+
+  if(!client || !idNumber || !module){
+    toast('Client, ID Number and Module are required', 'err');
+    return;
+  }
+
+  const now = new Date().toISOString();
+  if(editingTaskId){
+    const t = tasks.find(x=>x.id===editingTaskId);
+    Object.assign(t, {client, idNumber, module, status, description, steps, expectedResult, remarks:draftRemarks, updatedAt:now});
+    toast('Test case updated', 'ok');
+  } else {
+    tasks.push({id:uid(), client, idNumber, module, status, description, steps, expectedResult, remarks:draftRemarks, createdAt:now, updatedAt:now});
+    toast('Test case added', 'ok');
+  }
+  persistTasks();
+  if(extraClients.some(c => c.toLowerCase() === client.toLowerCase())){
+    extraClients = extraClients.filter(c => c.toLowerCase() !== client.toLowerCase());
+    persistClients();
+  }
+  closeModal();
+  render();
+}
+
+/* =========================================================
+   STATUS MANAGER
+   ========================================================= */
+function renderStatusManager(){
+  let rows = '';
+  statuses.forEach(s=>{
+    const usage = tasks.filter(t=>t.status===s.id).length;
+    rows += `
+      <div class="status-row">
+        <input type="color" class="color-swatch" value="${s.color}" onchange="updateStatusColor('${s.id}', this.value)">
+        <input type="text" value="${escAttr(s.name)}" onchange="updateStatusName('${s.id}', this.value)">
+        <span class="status-usage">${usage} case${usage!==1?'s':''}</span>
+        <button class="icon-btn" title="Delete status" onclick="removeStatus('${s.id}')">${iconTrash()}</button>
+      </div>
+    `;
+  });
+  return `
+    <div class="panel-block" style="padding:6px 20px;">
+      ${rows || '<div class="empty-state"><p>No statuses defined.</p></div>'}
+    </div>
+    <p style="font-size:12px; color:var(--ink-dim); margin-top:12px;">Changes save automatically. Deleting a status in use will move those test cases to "Not Started" (or the closest remaining status).</p>
+  `;
+}
+
+function updateStatusColor(id, color){
+  const s = statuses.find(x=>x.id===id);
+  if(s){ s.color = color; persistStatuses(); render(); }
+}
+function updateStatusName(id, name){
+  name = name.trim();
+  if(!name) return;
+  const s = statuses.find(x=>x.id===id);
+  if(s){ s.name = name; persistStatuses(); render(); }
+}
+function addStatus(){
+  const name = prompt('New status name:');
+  if(!name || !name.trim()) return;
+  const palette = ['#3454D1','#0CA678','#E8590C','#1971C2','#C2255C','#5C940D'];
+  const color = palette[statuses.length % palette.length];
+  statuses.push({id:uid(), name:name.trim(), color});
+  persistStatuses();
+  toast('Status added', 'ok');
+  render();
+}
+function removeStatus(id){
+  if(statuses.length <= 1){ toast('At least one status must remain', 'err'); return; }
+  const usage = tasks.filter(t=>t.status===id).length;
+  const s = statusById(id);
+  if(usage > 0){
+    if(!confirm(`"${s.name}" is used by ${usage} test case(s). They'll be moved to the first remaining status. Continue?`)) return;
+  }
+  statuses = statuses.filter(x=>x.id!==id);
+  const fallback = statuses[0] ? statuses[0].id : null;
+  if(fallback){
+    tasks.forEach(t=>{ if(t.status===id) t.status = fallback; });
+  }
+  persistStatuses();
+  persistTasks();
+  toast('Status removed', 'ok');
+  render();
+}
+
+/* =========================================================
+   SAVE / EXPORT / IMPORT (local + GitHub)
+   ========================================================= */
+function buildExportPayload(){
+  return {
+    app:'CaseWatch',
+    version:1,
+    exportedAt: new Date().toISOString(),
+    tasks, statuses
+  };
+}
+
+async function saveBlobToDisk(blob, suggestedName){
+  if(window.showSaveFilePicker){
+    try{
+      const handle = await window.showSaveFilePicker({
+        suggestedName,
+        types:[{description:'File', accept:{[blob.type || 'application/octet-stream']: ['.'+suggestedName.split('.').pop()]}}]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return true;
+    }catch(e){
+      if(e && e.name === 'AbortError') return false;
+      // fall through to download fallback
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = suggestedName;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  return true;
+}
+
+async function exportToLocalFolder(){
+  const payload = buildExportPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const ok = await saveBlobToDisk(blob, `casewatch-backup-${dateStamp()}.json`);
+  if(ok) toast('Data exported', 'ok');
+}
+
+function dateStamp(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function triggerImport(){
+  document.getElementById('importFileInput').click();
+}
+function handleImportFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      applyImportedData(data);
+    }catch(err){
+      toast('Could not parse file — is it a valid CaseWatch JSON export?', 'err');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+function applyImportedData(data){
+  if(!data || !Array.isArray(data.tasks)){
+    toast('File does not look like a CaseWatch export', 'err');
+    return;
+  }
+  const mode = confirm('Click OK to REPLACE all current data, or Cancel to MERGE with existing data.');
+  if(mode){
+    tasks = data.tasks;
+    statuses = Array.isArray(data.statuses) && data.statuses.length ? data.statuses : statuses;
+  } else {
+    const existingIds = new Set(tasks.map(t=>t.id));
+    data.tasks.forEach(t=>{ if(!existingIds.has(t.id)) tasks.push(t); });
+    if(Array.isArray(data.statuses)){
+      const existingStatusIds = new Set(statuses.map(s=>s.id));
+      data.statuses.forEach(s=>{ if(!existingStatusIds.has(s.id)) statuses.push(s); });
+    }
+  }
+  persistTasks(); persistStatuses();
+  toast('Data imported', 'ok');
+  render();
+}
+
+/* ---- GitHub sync ---- */
+function b64EncodeUnicode(str){
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m,p1)=>String.fromCharCode('0x'+p1)));
+}
+function b64DecodeUnicode(str){
+  return decodeURIComponent(atob(str.replace(/\n/g,'')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+function readSettingsForm(){
+  settings.githubToken = document.getElementById('gh_token').value.trim();
+  settings.githubRepo = document.getElementById('gh_repo').value.trim();
+  settings.githubBranch = document.getElementById('gh_branch').value.trim() || 'main';
+  settings.githubPath = document.getElementById('gh_path').value.trim() || 'casewatch-data.json';
+  persistSettings();
+}
+
+function setSyncMsg(html, kind){
+  const el = document.getElementById('syncMsg');
+  if(!el) return;
+  el.innerHTML = html;
+  el.className = 'status-msg ' + (kind||'info');
+  el.style.display = 'block';
+}
+
+async function githubPush(){
+  readSettingsForm();
+  const {githubToken, githubRepo, githubBranch, githubPath} = settings;
+  if(!githubToken || !githubRepo){ setSyncMsg('Please provide a token and repository (owner/repo).', 'err'); return; }
+  setSyncMsg('Pushing to GitHub…', 'info');
+  try{
+    const apiUrl = `https://api.github.com/repos/${githubRepo}/contents/${encodeURIComponent(githubPath)}`;
+    let sha = undefined;
+    const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(githubBranch)}`, {
+      headers:{Authorization:`token ${githubToken}`, Accept:'application/vnd.github+json'}
+    });
+    if(getRes.status === 200){
+      const getData = await getRes.json();
+      sha = getData.sha;
+    } else if(getRes.status !== 404){
+      const errData = await getRes.json().catch(()=>({}));
+      throw new Error(errData.message || `GET failed (${getRes.status})`);
+    }
+    const payload = buildExportPayload();
+    const content = b64EncodeUnicode(JSON.stringify(payload, null, 2));
+    const putRes = await fetch(apiUrl, {
+      method:'PUT',
+      headers:{Authorization:`token ${githubToken}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message:`CaseWatch data update — ${new Date().toISOString()}`,
+        content, sha, branch: githubBranch
+      })
+    });
+    if(!putRes.ok){
+      const errData = await putRes.json().catch(()=>({}));
+      throw new Error(errData.message || `PUT failed (${putRes.status})`);
+    }
+    setSyncMsg('Pushed to GitHub successfully.', 'ok');
+    toast('Pushed to GitHub', 'ok');
+  }catch(err){
+    setSyncMsg('GitHub push failed: ' + escHtml(err.message), 'err');
+    toast('GitHub push failed', 'err');
+  }
+}
+
+async function githubPull(){
+  readSettingsForm();
+  const {githubToken, githubRepo, githubBranch, githubPath} = settings;
+  if(!githubToken || !githubRepo){ setSyncMsg('Please provide a token and repository (owner/repo).', 'err'); return; }
+  setSyncMsg('Pulling from GitHub…', 'info');
+  try{
+    const apiUrl = `https://api.github.com/repos/${githubRepo}/contents/${encodeURIComponent(githubPath)}`;
+    const res = await fetch(`${apiUrl}?ref=${encodeURIComponent(githubBranch)}`, {
+      headers:{Authorization:`token ${githubToken}`, Accept:'application/vnd.github+json'}
+    });
+    if(!res.ok){
+      const errData = await res.json().catch(()=>({}));
+      throw new Error(errData.message || `GET failed (${res.status})`);
+    }
+    const data = await res.json();
+    const decoded = b64DecodeUnicode(data.content);
+    const parsed = JSON.parse(decoded);
+    applyImportedData(parsed);
+    setSyncMsg('Pulled from GitHub successfully.', 'ok');
+  }catch(err){
+    setSyncMsg('GitHub pull failed: ' + escHtml(err.message), 'err');
+    toast('GitHub pull failed', 'err');
+  }
+}
+
+/* =========================================================
+   SYNC VIEW
+   ========================================================= */
+function renderSyncView(){
+  return `
+    <div class="panel-block" style="padding:22px 24px; max-width:680px;">
+      <div class="sync-section">
+        <h3>${iconFolder()} Local file</h3>
+        <p class="desc">Save a full backup (test cases + statuses) as a JSON file to a folder you choose, or restore from a previous export.</p>
+        <div class="sync-row">
+          <button class="btn btn-primary" onclick="exportToLocalFolder()">${iconDownload()} Export to local folder</button>
+          <button class="btn" onclick="triggerImport()">${iconUpload()} Import from file</button>
+          <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="handleImportFile(this)">
+        </div>
+        <div class="field-hint" style="margin-top:8px;">If your browser supports it, "Export" opens a folder picker. Otherwise the file downloads to your default Downloads folder.</div>
+      </div>
+
+      <div class="sync-section">
+        <h3>${iconFile()} PDF report</h3>
+        <p class="desc">Generate a printable report of the currently selected client's test cases (respects active filters), sorted by ID ascending.</p>
+        <div class="sync-row">
+          <button class="btn btn-primary" onclick="exportReportPDF()">${iconFile()} Generate PDF report</button>
+        </div>
+      </div>
+
+      <div class="sync-section">
+        <h3>${iconGithub()} GitHub backup</h3>
+        <p class="desc">Push or pull your data as a JSON file in a GitHub repository. Your token is stored only in this browser's local storage.</p>
+        <div class="field">
+          <label>Personal Access Token</label>
+          <input type="password" id="gh_token" value="${escAttr(settings.githubToken)}" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onchange="readSettingsForm()">
+          <div class="field-hint">Needs "repo" (or "contents: write" for fine-grained) scope.</div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Repository</label>
+            <input type="text" id="gh_repo" value="${escAttr(settings.githubRepo)}" placeholder="owner/repo" onchange="readSettingsForm()">
+          </div>
+          <div class="field">
+            <label>Branch</label>
+            <input type="text" id="gh_branch" value="${escAttr(settings.githubBranch)}" placeholder="main" onchange="readSettingsForm()">
+          </div>
+        </div>
+        <div class="field">
+          <label>File path</label>
+          <input type="text" id="gh_path" value="${escAttr(settings.githubPath)}" placeholder="casewatch-data.json" onchange="readSettingsForm()">
+        </div>
+        <div class="sync-row">
+          <button class="btn btn-primary" onclick="githubPush()">${iconGithub()} Push to GitHub</button>
+          <button class="btn" onclick="githubPull()">${iconGithub()} Pull from GitHub</button>
+        </div>
+        <div class="status-msg" id="syncMsg" style="display:none;"></div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   PDF REPORT
+   ========================================================= */
+function exportReportPDF(){
+  if(!window.jspdf){ toast('PDF library did not load — check your connection', 'err'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const list = filteredTasks();
+
+  const marginX = 40;
+  let y = 46;
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.text('CaseWatch — Test Case Report', marginX, y);
+  y += 20;
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.setTextColor(90);
+  const scopeLabel = currentClient === '__ALL__' ? 'All clients' : currentClient;
+  doc.text(`Scope: ${scopeLabel}    Generated: ${new Date().toLocaleString()}`, marginX, y);
+  y += 18;
+
+  const counts = {};
+  statuses.forEach(s=>counts[s.id]=0);
+  list.forEach(t=>{ counts[t.status] = (counts[t.status]||0)+1; });
+  const summaryStr = statuses.map(s=>`${s.name}: ${counts[s.id]||0}`).join('   |   ');
+  doc.setFontSize(9.5);
+  doc.setTextColor(60);
+  doc.text(summaryStr, marginX, y, {maxWidth: 515});
+  y += 18;
+
+  const body = list.map(t=>{
+    const st = statusById(t.status);
+    const lastRemark = t.remarks && t.remarks.length ? t.remarks[t.remarks.length-1] : null;
+    return [
+      t.idNumber || '',
+      t.client || '',
+      t.module || '',
+      t.description || '',
+      t.steps || '',
+      t.expectedResult || '',
+      st.name,
+      lastRemark ? `${lastRemark.text} (${formatDateTime(lastRemark.ts)})` : ''
+    ];
+  });
+
+  doc.autoTable({
+    startY: y,
+    head: [['ID','Client','Module','Description','Steps','Expected Result','Status','Latest Remark']],
+    body,
+    styles:{fontSize:8, cellPadding:4, valign:'top', overflow:'linebreak'},
+    headStyles:{fillColor:[52,84,209], textColor:255, fontStyle:'bold'},
+    columnStyles:{
+      0:{cellWidth:42}, 1:{cellWidth:55}, 2:{cellWidth:55},
+      3:{cellWidth:95}, 4:{cellWidth:95}, 5:{cellWidth:90},
+      6:{cellWidth:48}, 7:{cellWidth:'auto'}
+    },
+    margin:{left:marginX, right:marginX},
+    didParseCell: function(data){
+      if(data.section === 'body' && data.column.index === 6){
+        const rowTask = list[data.row.index];
+        const st = statusById(rowTask.status);
+        const rgb = hexToRgb(st.color);
+        data.cell.styles.textColor = [rgb.r, rgb.g, rgb.b];
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
+  });
+
+  doc.save(`casewatch-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.pdf`);
+  toast('PDF report generated', 'ok');
+}
+
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const num = parseInt(hex,16);
+  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeModal();
+});
+
+setView('dashboard');
+</script>
+</body>
+</html>
