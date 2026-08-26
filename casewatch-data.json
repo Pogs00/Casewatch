@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:17:17.474Z",
+  "exportedAt": "2026-08-26T06:22:46.273Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -457,6 +457,32 @@
       "remarks": [],
       "createdAt": "2026-08-26T06:15:37.463Z",
       "updatedAt": "2026-08-26T06:15:37.463Z"
+    },
+    {
+      "id": "xkqirc8zsmt9pi6tg",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-002",
+      "module": "System Configuration",
+      "description": "Installation of KDS",
+      "steps": "",
+      "expectedResult": "Working KDS, Order from POS is sending correctly",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:22:12.484Z",
+      "updatedAt": "2026-08-26T06:22:12.484Z"
+    },
+    {
+      "id": "xkqzi1j8bmt9pid6l",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-003",
+      "module": "System Configuration",
+      "description": "Installation of menuX®",
+      "steps": "",
+      "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-26T06:22:20.732Z",
+      "updatedAt": "2026-08-26T06:22:20.732Z"
     }
   ],
   "statuses": [
