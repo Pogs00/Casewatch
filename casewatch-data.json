@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:57:04.702Z",
+  "exportedAt": "2026-08-26T06:57:38.007Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -528,13 +528,13 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-038",
       "module": "Kitchen Display",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "description": "Queue Monitor design and display",
       "steps": "1. Validate if the logo is correct\n2. Validate if the color is correct\n3. Validate if the item once bump change from in progress to ready",
       "expectedResult": "Order is reflected correctly, under in progress and ready",
       "remarks": [],
       "createdAt": "2026-08-26T06:51:16.920Z",
-      "updatedAt": "2026-08-26T06:51:16.920Z"
+      "updatedAt": "2026-08-26T06:57:17.856Z"
     },
     {
       "id": "x271uszewmt9qn2nv",
@@ -602,7 +602,7 @@
     {
       "id": "xvir2m0zamt9qqvzd",
       "name": "Not Applicable",
-      "color": "#0CA678"
+      "color": "#25745c"
     }
   ]
 }
