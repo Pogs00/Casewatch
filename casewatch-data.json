@@ -1,8 +1,74 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T05:21:31.563Z",
-  "tasks": [],
+  "exportedAt": "2026-08-26T05:32:43.249Z",
+  "tasks": [
+    {
+      "id": "xa5npi691mt9nflql",
+      "client": "Let's Eat Rockwell Pasig",
+      "idNumber": "TC-001",
+      "module": "System Configuration",
+      "status": "notstarted",
+      "description": "Installation of Aloha",
+      "steps": "",
+      "expectedResult": "Working Aloha POS",
+      "remarks": [],
+      "createdAt": "2026-08-26T05:24:12.621Z",
+      "updatedAt": "2026-08-26T05:24:12.621Z"
+    },
+    {
+      "id": "x3vugygvzmt9ngi0c",
+      "client": "Let's Eat Rockwell Pasig",
+      "idNumber": "TC-002",
+      "module": "System Configuration",
+      "status": "notstarted",
+      "description": "Installation of KDS",
+      "steps": "",
+      "expectedResult": "Working KDS, Order from POS is sending correctly",
+      "remarks": [],
+      "createdAt": "2026-08-26T05:24:54.444Z",
+      "updatedAt": "2026-08-26T05:24:54.444Z"
+    },
+    {
+      "id": "xmrosq2dxmt9nhxdc",
+      "client": "Let's Eat Rockwell Pasig",
+      "idNumber": "TC-003",
+      "module": "System Configuration",
+      "status": "notstarted",
+      "description": "Installation of menuX®",
+      "steps": "",
+      "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
+      "remarks": [],
+      "createdAt": "2026-08-26T05:26:01.008Z",
+      "updatedAt": "2026-08-26T05:26:14.957Z"
+    },
+    {
+      "id": "xtpj1bqtjmt9nlvfn",
+      "client": "Let's Eat Rockwell Pasig",
+      "idNumber": "TC-004",
+      "module": "menuX® - Startup ads",
+      "status": "notstarted",
+      "description": "First screen ads (Image, GIF or mp4)",
+      "steps": "",
+      "expectedResult": "Working ads",
+      "remarks": [],
+      "createdAt": "2026-08-26T05:29:05.123Z",
+      "updatedAt": "2026-08-26T05:29:05.123Z"
+    },
+    {
+      "id": "x0cbyfjn0mt9nn32t",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-001",
+      "module": "System Configuration",
+      "status": "notstarted",
+      "description": "Installation of Aloha",
+      "steps": "",
+      "expectedResult": "Working Aloha POS",
+      "remarks": [],
+      "createdAt": "2026-08-26T05:30:01.685Z",
+      "updatedAt": "2026-08-26T05:30:01.685Z"
+    }
+  ],
   "statuses": [
     {
       "id": "passed",
