@@ -283,7 +283,7 @@
     <div class="brand">
       <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"></polyline></svg></div>
       <div>
-        <div class="brand-name">CaseWatch</div>
+        <div class="brand-name" id="brandName">CaseWatch</div>
         <div class="brand-sub">Test Monitoring</div>
       </div>
     </div>
@@ -371,7 +371,8 @@ function saveJSON(key, val){
 
 let tasks = loadJSON(LS_TASKS, sampleTasks());
 let statuses = loadJSON(LS_STATUSES, DEFAULT_STATUSES);
-let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json'});
+let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch'});
+if(!settings.appName) settings.appName = 'CaseWatch';
 const LS_CLIENTS = 'casewatch_clients_v1';
 let extraClients = loadJSON(LS_CLIENTS, []); // clients added manually before they have any test cases
 function persistClients(){ saveJSON(LS_CLIENTS, extraClients); }
@@ -451,7 +452,17 @@ function filteredTasks(){
       (t.client||'').toLowerCase().includes(q)
     );
   }
-  list.sort((a,b)=> naturalCompare(a.idNumber, b.idNumber));
+  if(currentClient === '__ALL__'){
+    // Group by client first so each client's own ID sequence stays intact —
+    // otherwise cases from different clients interleave (e.g. Client A's
+    // #1 and #2 get split apart by Client B's #01 sorting in between).
+    list.sort((a,b)=>{
+      const clientCompare = naturalCompare(a.client, b.client);
+      return clientCompare !== 0 ? clientCompare : naturalCompare(a.idNumber, b.idNumber);
+    });
+  } else {
+    list.sort((a,b)=> naturalCompare(a.idNumber, b.idNumber));
+  }
   return list;
 }
 
@@ -569,10 +580,11 @@ function render(){
   const content = document.getElementById('content');
 
   const scopeLabel = currentClient === '__ALL__' ? 'All clients' : currentClient;
+  const moduleSuffix = (currentClient !== '__ALL__' && filterModule !== '__ALL__') ? ` · module: ${filterModule}` : '';
 
   if(view === 'dashboard'){
     title.textContent = 'Dashboard';
-    sub.textContent = scopeLabel + ' · status overview';
+    sub.textContent = scopeLabel + moduleSuffix + ' · status overview';
     actions.innerHTML = `
       <button class="btn" onclick="setView('cases')">${iconList()} View test cases</button>
       <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
@@ -580,7 +592,7 @@ function render(){
     content.innerHTML = renderDashboard();
   } else if(view === 'cases'){
     title.textContent = 'Test Cases';
-    sub.textContent = scopeLabel + ' · sorted by ID ascending';
+    sub.textContent = scopeLabel + moduleSuffix + ' · sorted by ID ascending';
     actions.innerHTML = `
       <button class="btn" onclick="exportReportPDF()">${iconFile()} Export PDF</button>
       <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
@@ -607,6 +619,7 @@ function iconList(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="curren
 function iconFile(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>`; }
 function iconEdit(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`; }
 function iconTrash(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`; }
+function iconCopy(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`; }
 function iconSearch(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`; }
 function iconDownload(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>`; }
 function iconUpload(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>`; }
@@ -619,7 +632,14 @@ function iconInbox(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="curre
    DASHBOARD
    ========================================================= */
 function renderDashboard(){
-  const list = scopedTasks();
+  const baseList = scopedTasks(); // client-scoped (or all, if viewing "All Clients")
+  const viewingAllClients = currentClient === '__ALL__';
+
+  // Module filtering only applies once you're inside a single client — when
+  // looking at all clients together, "by client" is the more useful drill-down.
+  const list = (!viewingAllClients && filterModule !== '__ALL__')
+    ? baseList.filter(t=>t.module===filterModule)
+    : baseList;
   const total = list.length;
 
   const counts = {};
@@ -660,45 +680,104 @@ function renderDashboard(){
     `;
   });
 
-  const modules = moduleList(list);
-  let moduleRows = '';
-  modules.forEach(m=>{
-    const mTasks = list.filter(t=>t.module===m);
-    const mPassed = mTasks.filter(t=>t.status==='passed').length;
-    const sharePct = total ? Math.round((mTasks.length/total)*100) : 0;
-    const passPct = mTasks.length ? Math.round((mPassed/mTasks.length)*100) : 0;
-    moduleRows += `<tr>
-      <td style="font-weight:600; white-space:nowrap;">${escHtml(m)}</td>
-      <td class="cell-desc" style="max-width:none; white-space:nowrap;">${mTasks.length} case${mTasks.length!==1?'s':''}</td>
-      <td style="white-space:nowrap;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
-            <div style="width:${sharePct}%; height:100%; background:var(--accent);"></div>
+  let filterBar = '';
+  let breakdownTable = '';
+
+  if(viewingAllClients){
+    // ---- By client: drill into a single client to see its modules ----
+    const clients = getClientList();
+    let clientRows = '';
+    clients.forEach(c=>{
+      const cTasks = tasks.filter(t=>t.client===c);
+      const cPassed = cTasks.filter(t=>t.status==='passed').length;
+      const sharePct = tasks.length ? Math.round((cTasks.length/tasks.length)*100) : 0;
+      const passPct = cTasks.length ? Math.round((cPassed/cTasks.length)*100) : 0;
+      clientRows += `<tr onclick="goToDashboardClient('${escAttr(c)}')" style="cursor:pointer;">
+        <td style="font-weight:600; white-space:nowrap;">${escHtml(c)}</td>
+        <td class="cell-desc" style="max-width:none; white-space:nowrap;">${cTasks.length} case${cTasks.length!==1?'s':''}</td>
+        <td style="white-space:nowrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+              <div style="width:${sharePct}%; height:100%; background:var(--accent);"></div>
+            </div>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${sharePct}% of total</span>
           </div>
-          <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${sharePct}% of total</span>
-        </div>
-      </td>
-      <td style="white-space:nowrap;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
-            <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
+        </td>
+        <td style="white-space:nowrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+              <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
+            </div>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${cPassed}/${cTasks.length} passed (${passPct}%)</span>
           </div>
-          <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${mPassed}/${mTasks.length} passed (${passPct}%)</span>
-        </div>
-      </td>
-    </tr>`;
-  });
-  const moduleTable = modules.length ? `
-    <div class="panel-block" style="margin-top:20px; padding:4px 0;">
-      <div style="padding:14px 20px 6px;"><div class="dash-head" style="margin-bottom:0;"><h2>By module</h2></div></div>
-      <table>
-        <thead><tr><th>Module</th><th>Test cases</th><th>Share of total</th><th>Pass rate</th></tr></thead>
-        <tbody>${moduleRows}</tbody>
-      </table>
-    </div>
-  ` : '';
+        </td>
+      </tr>`;
+    });
+    breakdownTable = clients.length ? `
+      <div class="panel-block" style="margin-top:20px; padding:4px 0;">
+        <div style="padding:14px 20px 6px;"><div class="dash-head" style="margin-bottom:0;"><h2>By client</h2></div></div>
+        <table>
+          <thead><tr><th>Client</th><th>Test cases</th><th>Share of total</th><th>Pass rate</th></tr></thead>
+          <tbody>${clientRows}</tbody>
+        </table>
+      </div>
+      <p style="font-size:12px; color:var(--ink-dim); margin-top:10px;">Click a client to see its modules.</p>
+    ` : '';
+  } else {
+    // ---- By module: filter and drill down within the selected client ----
+    const modules = moduleList(baseList);
+    let moduleOptions = `<option value="__ALL__">All modules</option>`;
+    modules.forEach(m=> moduleOptions += `<option value="${escAttr(m)}" ${filterModule===m?'selected':''}>${escHtml(m)}</option>`);
+    filterBar = modules.length ? `
+      <div class="filter-bar" style="margin-bottom:16px;">
+        <select onchange="filterModule=this.value; render();">${moduleOptions}</select>
+        ${filterModule !== '__ALL__' ? `<button class="btn btn-sm btn-ghost" onclick="filterModule='__ALL__'; render();">Clear module filter</button>` : ''}
+        <div class="filter-spacer"></div>
+        <span style="font-size:12px; color:var(--ink-dim);">${total} case${total!==1?'s':''} ${filterModule!=='__ALL__' ? `in "${escHtml(filterModule)}"` : ''}</span>
+      </div>
+    ` : '';
+
+    let moduleRows = '';
+    modules.forEach(m=>{
+      const mTasks = baseList.filter(t=>t.module===m);
+      const mPassed = mTasks.filter(t=>t.status==='passed').length;
+      const sharePct = baseList.length ? Math.round((mTasks.length/baseList.length)*100) : 0;
+      const passPct = mTasks.length ? Math.round((mPassed/mTasks.length)*100) : 0;
+      const isActive = filterModule === m;
+      moduleRows += `<tr onclick="filterModule='${escAttr(m)}'; render();" style="cursor:pointer; ${isActive ? 'background:var(--accent-soft);' : ''}">
+        <td style="font-weight:600; white-space:nowrap;">${escHtml(m)}</td>
+        <td class="cell-desc" style="max-width:none; white-space:nowrap;">${mTasks.length} case${mTasks.length!==1?'s':''}</td>
+        <td style="white-space:nowrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+              <div style="width:${sharePct}%; height:100%; background:var(--accent);"></div>
+            </div>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${sharePct}% of total</span>
+          </div>
+        </td>
+        <td style="white-space:nowrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
+              <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
+            </div>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${mPassed}/${mTasks.length} passed (${passPct}%)</span>
+          </div>
+        </td>
+      </tr>`;
+    });
+    breakdownTable = modules.length ? `
+      <div class="panel-block" style="margin-top:20px; padding:4px 0;">
+        <div style="padding:14px 20px 6px;"><div class="dash-head" style="margin-bottom:0;"><h2>By module</h2></div></div>
+        <table>
+          <thead><tr><th>Module</th><th>Test cases</th><th>Share of total</th><th>Pass rate</th></tr></thead>
+          <tbody>${moduleRows}</tbody>
+        </table>
+      </div>
+    ` : '';
+  }
 
   return `
+    ${filterBar}
     <div class="signal-strip">
       <div class="signal-strip-top">
         <div class="signal-title">Signal strip</div>
@@ -708,7 +787,7 @@ function renderDashboard(){
       <div class="signal-legend">${legendHtml}</div>
     </div>
     <div class="stat-grid">${statCards}</div>
-    ${moduleTable}
+    ${breakdownTable}
   `;
 }
 
@@ -717,6 +796,14 @@ function goToCasesWithStatus(statusId){
   filterModule = '__ALL__';
   searchTerm = '';
   setView('cases');
+}
+
+function goToDashboardClient(client){
+  currentClient = client;
+  filterStatus = '__ALL__';
+  filterModule = '__ALL__';
+  searchTerm = '';
+  setView('dashboard');
 }
 
 /* =========================================================
@@ -753,6 +840,7 @@ function renderCasesView(){
         <td style="font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); white-space:nowrap;">${lastRemark ? formatDateTime(lastRemark.ts) : '—'}</td>
         <td onclick="event.stopPropagation()">
           <div class="row-actions">
+            <button class="icon-btn" title="Copy to client" onclick="openCopyModal('${t.id}')">${iconCopy()}</button>
             <button class="icon-btn" title="Edit" onclick="openTaskModal('${t.id}')">${iconEdit()}</button>
             <button class="icon-btn" title="Delete" onclick="deleteTask('${t.id}')">${iconTrash()}</button>
           </div>
@@ -811,11 +899,86 @@ function deleteTask(id){
 }
 
 /* =========================================================
+   COPY TEST CASE TO ANOTHER CLIENT
+   ========================================================= */
+function openCopyModal(taskId){
+  const t = tasks.find(x=>x.id===taskId);
+  if(!t) return;
+  copySourceTaskId = taskId;
+  const clientOptions = getClientList().filter(c => c.toLowerCase() !== t.client.toLowerCase());
+
+  const html = `
+  <div class="modal-backdrop" onclick="if(event.target===this) closeCopyModal()">
+    <div class="modal modal-sm">
+      <div class="modal-head">
+        <h2>Copy test case</h2>
+        <button class="icon-btn" onclick="closeCopyModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:var(--ink-dim); margin-top:0; line-height:1.5;">
+          Copy <strong>${escHtml(t.idNumber)} — ${escHtml(t.module)}</strong> from <strong>${escHtml(t.client)}</strong> to another client.
+          The copy gets a fresh auto-generated ID, its status resets, and remarks aren't carried over.
+        </p>
+        <div class="field">
+          <label>Target client</label>
+          <input type="text" id="copy_client" list="copyClientOptions" placeholder="e.g. Globex Inc" onkeydown="if(event.key==='Enter') performCopy()">
+          <datalist id="copyClientOptions">${clientOptions.map(c=>`<option value="${escAttr(c)}">`).join('')}</datalist>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeCopyModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="performCopy()">${iconCopy()} Copy test case</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modalRoot').innerHTML = html;
+  const inp = document.getElementById('copy_client');
+  if(inp) inp.focus();
+}
+
+function closeCopyModal(){
+  document.getElementById('modalRoot').innerHTML = '';
+  copySourceTaskId = null;
+}
+
+function performCopy(){
+  const inp = document.getElementById('copy_client');
+  const target = inp ? inp.value.trim() : '';
+  if(!target){ toast('Enter a target client', 'err'); return; }
+  const t = tasks.find(x=>x.id===copySourceTaskId);
+  if(!t) return;
+  if(target.toLowerCase() === t.client.toLowerCase()){
+    toast('Choose a different client to copy to', 'err');
+    return;
+  }
+  const now = new Date().toISOString();
+  const notStarted = statuses.find(s=>s.id==='notstarted');
+  const initialStatus = notStarted ? notStarted.id : (statuses[0] ? statuses[0].id : t.status);
+  const newId = nextIdForClient(target);
+
+  tasks.push({
+    id: uid(), client: target, idNumber: newId, module: t.module,
+    description: t.description, steps: t.steps, expectedResult: t.expectedResult,
+    status: initialStatus, remarks: [], createdAt: now, updatedAt: now
+  });
+
+  if(extraClients.some(c => c.toLowerCase() === target.toLowerCase())){
+    extraClients = extraClients.filter(c => c.toLowerCase() !== target.toLowerCase());
+    persistClients();
+  }
+  persistTasks();
+  toast(`Copied to ${target} as ${newId}`, 'ok');
+  closeCopyModal();
+  render();
+}
+
+/* =========================================================
    TASK MODAL (add/edit)
    ========================================================= */
 let editingTaskId = null;
 let draftRemarks = [];
 let idAutoFilled = false;
+let copySourceTaskId = null;
 
 function openTaskModal(id){
   editingTaskId = id || null;
@@ -885,7 +1048,10 @@ function openTaskModal(id){
         </div>
       </div>
       <div class="modal-foot">
-        ${t ? `<button class="btn btn-danger" style="margin-right:auto" onclick="deleteTask('${t.id}'); closeModal();">${iconTrash()} Delete</button>` : ''}
+        ${t ? `<div style="margin-right:auto; display:flex; gap:8px;">
+          <button class="btn btn-danger" onclick="deleteTask('${t.id}'); closeModal();">${iconTrash()} Delete</button>
+          <button class="btn" onclick="openCopyModal('${t.id}')">${iconCopy()} Copy to client</button>
+        </div>` : ''}
         <button class="btn" onclick="closeModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveTask()">${iconCheck()} Save test case</button>
       </div>
@@ -1074,7 +1240,8 @@ async function saveBlobToDisk(blob, suggestedName){
 async function exportToLocalFolder(){
   const payload = buildExportPayload();
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-  const ok = await saveBlobToDisk(blob, `casewatch-backup-${dateStamp()}.json`);
+  const slug = (settings.appName || 'CaseWatch').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'casewatch';
+  const ok = await saveBlobToDisk(blob, `${slug}-backup-${dateStamp()}.json`);
   if(ok) toast('Data exported', 'ok');
 }
 
@@ -1171,7 +1338,7 @@ async function githubPush(){
       method:'PUT',
       headers:{Authorization:`token ${githubToken}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json'},
       body: JSON.stringify({
-        message:`CaseWatch data update — ${new Date().toISOString()}`,
+        message:`${settings.appName || 'CaseWatch'} data update — ${new Date().toISOString()}`,
         content, sha, branch: githubBranch
       })
     });
@@ -1218,6 +1385,15 @@ async function githubPull(){
 function renderSyncView(){
   return `
     <div class="panel-block" style="padding:22px 24px; max-width:680px;">
+      <div class="sync-section">
+        <h3>${iconEdit()} Branding</h3>
+        <p class="desc">Rename the header shown in the sidebar, browser tab, and generated PDF reports — handy for white-labeling reports per client or agency.</p>
+        <div class="field" style="max-width:320px;">
+          <label>Header / report name</label>
+          <input type="text" id="app_name" value="${escAttr(settings.appName || 'CaseWatch')}" placeholder="CaseWatch" onchange="updateAppName(this.value)">
+        </div>
+      </div>
+
       <div class="sync-section">
         <h3>${iconFolder()} Local file</h3>
         <p class="desc">Save a full backup (test cases + statuses) as a JSON file to a folder you choose, or restore from a previous export.</p>
@@ -1283,7 +1459,7 @@ function exportReportPDF(){
 
   doc.setFont('helvetica','bold');
   doc.setFontSize(16);
-  doc.text('CaseWatch — Test Case Report', marginX, y);
+  doc.text(`${settings.appName || 'CaseWatch'} — Test Case Report`, marginX, y);
   y += 20;
 
   doc.setFont('helvetica','normal');
@@ -1340,7 +1516,8 @@ function exportReportPDF(){
     }
   });
 
-  doc.save(`casewatch-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.pdf`);
+  const pdfSlug = (settings.appName || 'CaseWatch').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'casewatch';
+  doc.save(`${pdfSlug}-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.pdf`);
   toast('PDF report generated', 'ok');
 }
 
@@ -1358,6 +1535,21 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') closeModal();
 });
 
+/* Branding — custom header name, e.g. for white-labeled reports */
+function applyBranding(){
+  const name = (settings.appName || 'CaseWatch').trim() || 'CaseWatch';
+  const brandEl = document.getElementById('brandName');
+  if(brandEl) brandEl.textContent = name;
+  document.title = name + ' — Test Case Monitoring';
+}
+function updateAppName(val){
+  settings.appName = (val || '').trim() || 'CaseWatch';
+  persistSettings();
+  applyBranding();
+  toast('Header name updated', 'ok');
+}
+
+applyBranding();
 setView('dashboard');
 </script>
 </body>
