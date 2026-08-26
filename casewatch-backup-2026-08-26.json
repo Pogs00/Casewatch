@@ -1,0 +1,38 @@
+{
+  "app": "CaseWatch",
+  "version": 1,
+  "exportedAt": "2026-08-26T04:42:54.787Z",
+  "tasks": [],
+  "statuses": [
+    {
+      "id": "passed",
+      "name": "Passed",
+      "color": "#2F9E44"
+    },
+    {
+      "id": "failed",
+      "name": "Failed",
+      "color": "#E03131"
+    },
+    {
+      "id": "retest",
+      "name": "Re-test",
+      "color": "#F08C00"
+    },
+    {
+      "id": "onhold",
+      "name": "On Hold",
+      "color": "#868E96"
+    },
+    {
+      "id": "confirm",
+      "name": "For Confirmation",
+      "color": "#7048E8"
+    },
+    {
+      "id": "notstarted",
+      "name": "Not Started",
+      "color": "#495057"
+    }
+  ]
+}
