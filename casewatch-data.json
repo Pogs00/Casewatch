@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T06:42:57.061Z",
+  "exportedAt": "2026-08-26T06:43:25.320Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -40,7 +40,7 @@
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
       "remarks": [],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-26T06:42:27.025Z"
+      "updatedAt": "2026-08-26T06:43:13.256Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -519,7 +519,7 @@
     {
       "id": "xfejm4vlzmt9q7kox",
       "name": "In Progress",
-      "color": "#929405"
+      "color": "#8c8e06"
     }
   ]
 }
