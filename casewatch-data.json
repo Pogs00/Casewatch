@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-27T06:30:52.408Z",
+  "exportedAt": "2026-08-27T07:38:14.740Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -34,19 +34,19 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-003",
       "module": "System Configuration",
-      "status": "xfejm4vlzmt9q7kox",
+      "status": "failed",
       "description": "Installation of menuX®",
       "steps": "",
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
       "remarks": [
         {
-          "id": "xk7wnwsc1mtayvy1f",
-          "text": "Waiting for dev team advise if ready for testing",
-          "ts": "2026-08-27T03:32:37.011Z"
+          "id": "x7h7ocgfbmtb7j0n4",
+          "text": "Not installed yet",
+          "ts": "2026-08-27T07:34:30.400Z"
         }
       ],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-27T03:32:37.603Z"
+      "updatedAt": "2026-08-27T07:34:32.736Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -144,20 +144,26 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-012",
       "module": "Discount",
-      "status": "retest",
+      "status": "passed",
       "description": "Apply a senior citizen discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply SCD using discount button\n3. Enter the senior details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xd1xhx40xmtb7f2ok",
+          "text": "Tested ok",
+          "ts": "2026-08-27T07:31:26.420Z"
+        }
+      ],
       "createdAt": "2026-08-26T05:46:36.269Z",
-      "updatedAt": "2026-08-27T06:29:12.778Z"
+      "updatedAt": "2026-08-27T07:31:29.876Z"
     },
     {
       "id": "xuu2nnetamt9o9399",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-013",
       "module": "Discount",
-      "status": "retest",
+      "status": "passed",
       "description": "Apply a PWD discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply PWD using discount button\n3. Enter the PWD details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
@@ -166,10 +172,15 @@
           "id": "x9qqs7dkcmtb575nu",
           "text": "Encounter issue with \"item price on open item is under limit\"",
           "ts": "2026-08-27T06:29:17.802Z"
+        },
+        {
+          "id": "xr017qhrtmtb7fa9v",
+          "text": "Tested ok",
+          "ts": "2026-08-27T07:31:36.259Z"
         }
       ],
       "createdAt": "2026-08-26T05:47:08.349Z",
-      "updatedAt": "2026-08-27T06:29:24.575Z"
+      "updatedAt": "2026-08-27T07:31:40.804Z"
     },
     {
       "id": "xlt1va0e8mt9oa0jg",
@@ -317,52 +328,76 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-026",
       "module": "menuX® - Login",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Login by touching the SOK screen",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap Login\n3. Select the order mode",
       "expectedResult": "Successfully enter the order mode screen (dine in or take out)",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xf1vll3jpmtb7jsx1",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:07.045Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:00:22.892Z",
-      "updatedAt": "2026-08-26T06:09:33.922Z"
+      "updatedAt": "2026-08-27T07:35:07.588Z"
     },
     {
       "id": "x7rtonk4bmt9orc2r",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-027",
       "module": "menuX® - Sales",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Process a single item as cash sale (payment at the counter)",
       "steps": "1. Select one product in any menu category\n2. Tap add to cart\n3. Click view order to validate the order\n4. Select confirm and proceed to the payment page\n5. Select the payment method\n6. Complete the transaction",
       "expectedResult": "Sale completes; Order slip printed, guest will go to cashier to pay",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xb64ry06nmtb7jwqk",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:11.996Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:01:19.587Z",
-      "updatedAt": "2026-08-26T06:09:37.717Z"
+      "updatedAt": "2026-08-27T07:35:12.909Z"
     },
     {
       "id": "xod6u6mfumt9osu03",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-028",
       "module": "Sales",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Recall order in the POS",
       "steps": "1. Launch POS application\n2. Enter valid username/PIN\n3. Navigate to first panel and click kiosk order\n4. Kiosk order box will pop-up\n5. Select the order number and click ok\n6. Navigate to Recall button\n7. Click the SOK box and select the recalled order\n8. Proceed to discount if needed, and pay",
       "expectedResult": "Order successfully recalled",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xcortmrprmtb7k9er",
+          "text": "Working but no item to recall yet",
+          "ts": "2026-08-27T07:35:28.419Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:02:29.475Z",
-      "updatedAt": "2026-08-26T06:09:42.202Z"
+      "updatedAt": "2026-08-27T07:35:29.220Z"
     },
     {
       "id": "xkl6ci6fqmt9ov53n",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-029",
       "module": "menuX® - Sales",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Process a Combo-item as no-cash sale (card or e-wallet)",
       "steps": "1. Select one product in any menu category\n2. Tap add to cart\n3. Click view order to validate the order\n4. Select confirm and proceed to the payment page\n5. Select the payment method\n6. Complete the transaction",
       "expectedResult": "Sale completes; Sales invoice printed; guest will wait for the order complete for pickup",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xcfm89tsmmtb7keec",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:34.884Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:04:17.171Z",
-      "updatedAt": "2026-08-26T06:09:46.490Z"
+      "updatedAt": "2026-08-27T07:35:35.387Z"
     },
     {
       "id": "xdcaxstx4mt9oxlbg",
@@ -408,65 +443,95 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-030",
       "module": "menuX® - Design",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Start-up Ads",
       "steps": "1. Launch SOK application (automatic upon open)",
       "expectedResult": "Ads successfully reflected",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xwn4htg54mtb7ki63",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:39.771Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:10:19.555Z",
-      "updatedAt": "2026-08-26T06:11:24.226Z"
+      "updatedAt": "2026-08-27T07:35:40.243Z"
     },
     {
       "id": "x6z07xgmvmt9p45n6",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-031",
       "module": "menuX® - Design",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Banner Ads",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)",
       "expectedResult": "Banners successfully reflected",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xfdo079rbmtb7km44",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:44.884Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:11:17.778Z",
-      "updatedAt": "2026-08-26T06:11:17.778Z"
+      "updatedAt": "2026-08-27T07:35:45.256Z"
     },
     {
       "id": "xqgo4rzbvmt9p51h3",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-032",
       "module": "menuX® - Design",
-      "status": "notstarted",
+      "status": "failed",
       "description": "New item banner (featured product)",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)",
       "expectedResult": "New item images successfully reflected in the first screen",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "x1102z8limtb7kqh6",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:50.538Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:11:59.031Z",
-      "updatedAt": "2026-08-26T06:12:57.609Z"
+      "updatedAt": "2026-08-27T07:35:50.976Z"
     },
     {
       "id": "xe680x9r5mt9p5reg",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-033",
       "module": "menuX® - Upselling and Recommendation",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Upselling",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)\n5. Select one product in any menu category\n6. Tap add to cart\n7. Select item in the upsell pop-up",
       "expectedResult": "Upselling successfully shown items pre-selected by the store",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "x5g6dkxaqmtb7kuih",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:35:55.769Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:12:32.632Z",
-      "updatedAt": "2026-08-26T06:12:32.632Z"
+      "updatedAt": "2026-08-27T07:35:56.264Z"
     },
     {
       "id": "xjam8fpxgmt9p67wh",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-034",
       "module": "menuX® - Upselling and Recommendation",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Recommendation",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)\n5. Select one product in any menu category\n6. Tap add to cart\n7. Select item in the upsell pop-up\n8. Click view order to validate the order\n9. Select the recommended item in the carousel",
       "expectedResult": "Recommendation successfully shown items pre-selected by the store",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xoalkmzxlmtb7kyyw",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:01.544Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:12:54.017Z",
-      "updatedAt": "2026-08-26T06:12:54.017Z"
+      "updatedAt": "2026-08-27T07:36:02.096Z"
     },
     {
       "id": "xkewntasdmt9p9q0n",
@@ -626,7 +691,7 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-041",
       "module": "Digital Menu Board",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Display",
       "steps": "",
       "expectedResult": "Display the correct menu",
@@ -635,75 +700,253 @@
           "id": "xjzxxiuiimt9r5beb",
           "text": "For development c/o dev team",
           "ts": "2026-08-26T07:08:11.123Z"
+        },
+        {
+          "id": "xoszkahvemtb7l4qw",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:09.032Z"
         }
       ],
       "createdAt": "2026-08-26T07:07:45.796Z",
-      "updatedAt": "2026-08-26T07:08:11.596Z"
+      "updatedAt": "2026-08-27T07:36:10.759Z"
     },
     {
       "id": "xqwz7g31qmt9r7z0s",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-042",
       "module": "BIR Report",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Z Reading Report",
       "steps": "",
       "expectedResult": "",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "x2uayqwxxmtb7labj",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:16.255Z"
+        }
+      ],
       "createdAt": "2026-08-26T07:10:15.051Z",
-      "updatedAt": "2026-08-26T07:10:15.051Z"
+      "updatedAt": "2026-08-27T07:36:16.648Z"
     },
     {
       "id": "xunfu1ztnmt9r87wc",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-043",
       "module": "BIR Report",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Detailed Summary Report",
       "steps": "",
       "expectedResult": "",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xl31xoy46mtb7ldrs",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:20.728Z"
+        }
+      ],
       "createdAt": "2026-08-26T07:10:26.556Z",
-      "updatedAt": "2026-08-26T07:10:26.556Z"
+      "updatedAt": "2026-08-27T07:36:21.071Z"
     },
     {
       "id": "xxsqms1bamt9r8ha3",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-044",
       "module": "BIR Report",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Sales Summary Report",
       "steps": "",
       "expectedResult": "",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xln3dkinsmtb7lifz",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:26.783Z"
+        }
+      ],
       "createdAt": "2026-08-26T07:10:38.715Z",
-      "updatedAt": "2026-08-26T07:10:38.715Z"
+      "updatedAt": "2026-08-27T07:36:27.272Z"
     },
     {
       "id": "xgcg0rxwkmt9r8pic",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-045",
       "module": "BIR Report",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Void Report",
       "steps": "",
       "expectedResult": "",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xbsm6z3eimtb7llx4",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:31.288Z"
+        }
+      ],
       "createdAt": "2026-08-26T07:10:49.380Z",
-      "updatedAt": "2026-08-26T07:10:49.380Z"
+      "updatedAt": "2026-08-27T07:36:31.696Z"
     },
     {
       "id": "xfhv00rxnmt9r9gbc",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-046",
       "module": "BIR Report",
-      "status": "notstarted",
+      "status": "failed",
       "description": "Government Mandated Report (SCD, PWD, NACD, Diplomat)",
       "steps": "",
       "expectedResult": "",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xpmytru1ymtb7lpmo",
+          "text": "Not working yet",
+          "ts": "2026-08-27T07:36:36.096Z"
+        }
+      ],
       "createdAt": "2026-08-26T07:11:24.120Z",
-      "updatedAt": "2026-08-26T07:11:24.120Z"
+      "updatedAt": "2026-08-27T07:36:36.497Z"
+    },
+    {
+      "id": "xwaphwgmdmtb7mpst",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-004",
+      "module": "Login",
+      "description": "Cashier login with valid credentials",
+      "steps": "1. Launch POS application\n2. Enter valid username/PIN",
+      "expectedResult": "User is authenticated and the cashier can now access the cash drawer function for cash fund validation",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:22.973Z",
+      "updatedAt": "2026-08-27T07:37:22.973Z"
+    },
+    {
+      "id": "xggtq3ofnmtb7msto",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-005",
+      "module": "Login",
+      "description": "Login with invalid credentials is rejected",
+      "steps": "1. Launch POS application\n2. Enter invalid PIN",
+      "expectedResult": "",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:26.892Z",
+      "updatedAt": "2026-08-27T07:37:26.892Z"
+    },
+    {
+      "id": "x04dn9d8vmtb7muxh",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-006",
+      "module": "Cash Drawers",
+      "description": "Enter a cash fund",
+      "steps": "1. Click the assign drawer button\n2. Tap add cash fund\n3. Enter amount of the cash fund",
+      "expectedResult": "Amount will be added to the drawer successfully",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:29.621Z",
+      "updatedAt": "2026-08-27T07:37:29.621Z"
+    },
+    {
+      "id": "xslj947nbmtb7mxa4",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-007",
+      "module": "Sales",
+      "description": "Process a single-item cash sale",
+      "steps": "1. Select one product\n2. Select the order mode\n3. Click Pay\n4. Select Cash tender\n5. Enter amount tendered\n6. Transaction will be complete",
+      "expectedResult": "Sale completes; Drawer will open and the change due calculated correctly; receipt is generated.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:32.668Z",
+      "updatedAt": "2026-08-27T07:37:32.668Z"
+    },
+    {
+      "id": "xv9frqw6jmtb7n4is",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-008",
+      "module": "Sales",
+      "description": "Process a multi-item sale with card payment",
+      "steps": "1. Select 3 different products\n2. Select the order mode\n3. Click Pay\n4. Select Card/e-wallet tender\n5. Transaction will be complete",
+      "expectedResult": "Total reflects sum of item prices + tax; payment approved (maya terminal); receipt itemizes all products.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:42.052Z",
+      "updatedAt": "2026-08-27T07:37:42.052Z"
+    },
+    {
+      "id": "x5zv1rm43mtb7n7l6",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-009",
+      "module": "Sales",
+      "description": "Process a split-tender payment (cash + card)",
+      "steps": "1. Add item(s)\n2. Select the order mode\n2. Click Pay\n3. Enter partial cash amount\n4. Apply remaining balance to card/QR",
+      "expectedResult": "Both tenders are recorded against the transaction; receipt shows itemized payment breakdown.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:46.025Z",
+      "updatedAt": "2026-08-27T07:37:46.025Z"
+    },
+    {
+      "id": "xm5elzichmtb7naox",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-010",
+      "module": "Discount",
+      "description": "Apply a percentage discount to a transaction",
+      "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply 10% discount using discount button\n4. Enter the manager code to proceed\n5. Proceed to payment",
+      "expectedResult": "Discount is applied correctly to subtotal; tax recalculates on discounted amount; receipt shows discount line.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:50.049Z",
+      "updatedAt": "2026-08-27T07:37:50.049Z"
+    },
+    {
+      "id": "x25r5fe5cmtb7ndoh",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-011",
+      "module": "Discount",
+      "description": "Apply an amount off discount to a transaction",
+      "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply 30 off discount using discount button\n4. Enter the manager code to proceed\n5. Proceed to payment",
+      "expectedResult": "Discount is applied correctly to subtotal; tax recalculates on discounted amount; receipt shows discount line.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:53.920Z",
+      "updatedAt": "2026-08-27T07:37:53.920Z"
+    },
+    {
+      "id": "xd1fmg01smtb7nh5d",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-012",
+      "module": "Discount",
+      "description": "Apply a senior citizen discount",
+      "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply SCD using discount button\n3. Enter the senior details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
+      "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:37:58.417Z",
+      "updatedAt": "2026-08-27T07:37:58.417Z"
+    },
+    {
+      "id": "xnujwrv5omtb7nk4h",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-013",
+      "module": "Discount",
+      "description": "Apply a PWD discount",
+      "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply PWD using discount button\n3. Enter the PWD details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
+      "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:38:02.273Z",
+      "updatedAt": "2026-08-27T07:38:02.273Z"
+    },
+    {
+      "id": "xmpovcqscmtb7nphu",
+      "client": "Torikizoku Serendra",
+      "idNumber": "TS-014",
+      "module": "Discount",
+      "description": "Apply a National Athletes and Coaches discount",
+      "steps": "1. Add item(s) worth P1120 (For easy testing)\n3. Select the order mode\n2. Apply NAAC using discount button\n3. Enter the NAAC details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
+      "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
+      "status": "notstarted",
+      "remarks": [],
+      "createdAt": "2026-08-27T07:38:09.234Z",
+      "updatedAt": "2026-08-27T07:38:09.234Z"
     }
   ],
   "statuses": [
