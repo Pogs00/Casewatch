@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-27T06:28:25.450Z",
+  "exportedAt": "2026-08-27T06:30:52.408Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -144,26 +144,32 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-012",
       "module": "Discount",
-      "status": "passed",
+      "status": "retest",
       "description": "Apply a senior citizen discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply SCD using discount button\n3. Enter the senior details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
       "remarks": [],
       "createdAt": "2026-08-26T05:46:36.269Z",
-      "updatedAt": "2026-08-26T07:09:00.017Z"
+      "updatedAt": "2026-08-27T06:29:12.778Z"
     },
     {
       "id": "xuu2nnetamt9o9399",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-013",
       "module": "Discount",
-      "status": "passed",
+      "status": "retest",
       "description": "Apply a PWD discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply PWD using discount button\n3. Enter the PWD details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "x9qqs7dkcmtb575nu",
+          "text": "Encounter issue with \"item price on open item is under limit\"",
+          "ts": "2026-08-27T06:29:17.802Z"
+        }
+      ],
       "createdAt": "2026-08-26T05:47:08.349Z",
-      "updatedAt": "2026-08-26T07:09:07.313Z"
+      "updatedAt": "2026-08-27T06:29:24.575Z"
     },
     {
       "id": "xlt1va0e8mt9oa0jg",
@@ -179,10 +185,15 @@
           "id": "xmvkasffkmtb01js4",
           "text": "For re-testing, will upload NACD watcher",
           "ts": "2026-08-27T04:04:58.084Z"
+        },
+        {
+          "id": "xtk20kjxemtb58joj",
+          "text": "Still has error, Presentation with issue there's an name attached even without adding",
+          "ts": "2026-08-27T06:30:22.627Z"
         }
       ],
       "createdAt": "2026-08-26T05:47:51.484Z",
-      "updatedAt": "2026-08-27T04:04:58.851Z"
+      "updatedAt": "2026-08-27T06:30:23.915Z"
     },
     {
       "id": "xma4sx3lxmt9oaoho",
@@ -208,7 +219,7 @@
       "expectedResult": "Zero rated is applied correctly to subtotal; receipt shows line removing the VAT, customer details and breakdown reflecting the transaction as zero rated;",
       "remarks": [],
       "createdAt": "2026-08-26T05:48:58.100Z",
-      "updatedAt": "2026-08-26T07:09:15.318Z"
+      "updatedAt": "2026-08-27T06:29:32.478Z"
     },
     {
       "id": "xqup1soammt9obyt9",
