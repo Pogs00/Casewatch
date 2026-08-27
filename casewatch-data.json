@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-26T07:59:54.557Z",
+  "exportedAt": "2026-08-27T04:07:14.423Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -38,9 +38,15 @@
       "description": "Installation of menuX®",
       "steps": "",
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xk7wnwsc1mtayvy1f",
+          "text": "Waiting for dev team advise if ready for testing",
+          "ts": "2026-08-27T03:32:37.011Z"
+        }
+      ],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-26T06:42:27.025Z"
+      "updatedAt": "2026-08-27T03:32:37.603Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -168,9 +174,15 @@
       "description": "Apply a National Athletes and Coaches discount",
       "steps": "1. Add item(s) worth P1120 (For easy testing)\n3. Select the order mode\n2. Apply NAAC using discount button\n3. Enter the NAAC details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xmvkasffkmtb01js4",
+          "text": "For re-testing, will upload NACD watcher",
+          "ts": "2026-08-27T04:04:58.084Z"
+        }
+      ],
       "createdAt": "2026-08-26T05:47:51.484Z",
-      "updatedAt": "2026-08-26T07:09:04.702Z"
+      "updatedAt": "2026-08-27T04:04:58.851Z"
     },
     {
       "id": "xma4sx3lxmt9oaoho",
@@ -493,9 +505,15 @@
       "description": "Display item",
       "steps": "1. Order from the POS sync to the KDS depending on the configuration (on the fly or afer payment)",
       "expectedResult": "Item reflected in the KDS is correct",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "xpoprq97tmtawt074",
+          "text": "Item displaying properly",
+          "ts": "2026-08-27T02:34:20.608Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:45:42.984Z",
-      "updatedAt": "2026-08-26T06:56:16.946Z"
+      "updatedAt": "2026-08-27T02:34:21.312Z"
     },
     {
       "id": "x98asg2ecmt9qeuuu",
@@ -505,10 +523,16 @@
       "status": "passed",
       "description": "Color coding",
       "steps": "1. Wait for the order to determine the color-coding if working",
-      "expectedResult": "Color coding reflected properly per added time, Blue 0-5m, Yellow 5-10m, Red 10-onwards",
-      "remarks": [],
+      "expectedResult": "Color coding reflected properly per added time (Gray, Yellow and Red)",
+      "remarks": [
+        {
+          "id": "xrqeelgfpmtayuedn",
+          "text": "1 to 3 min Gray, 3 to 4 min Yellow, 4 min onwards Red",
+          "ts": "2026-08-27T03:31:24.875Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:47:36.630Z",
-      "updatedAt": "2026-08-26T06:56:20.778Z"
+      "updatedAt": "2026-08-27T03:31:29.020Z"
     },
     {
       "id": "xez3leb74mt9qfwiw",
@@ -519,9 +543,15 @@
       "description": "Bumping",
       "steps": "1. Touch the item in the KDS to bump",
       "expectedResult": "Item bump properly and removed to the monitor",
-      "remarks": [],
+      "remarks": [
+        {
+          "id": "x9d232d8vmtawt9o0",
+          "text": "Bumping works fine",
+          "ts": "2026-08-27T02:34:32.880Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:48:25.448Z",
-      "updatedAt": "2026-08-26T06:56:23.890Z"
+      "updatedAt": "2026-08-27T02:34:33.318Z"
     },
     {
       "id": "xuv6dryd8mt9qjku0",
@@ -547,7 +577,7 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-039",
       "module": "Order Point",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Image 800x600",
       "steps": "1. Check the second display while in idle mode",
       "expectedResult": "Image is reflected correctly",
@@ -559,14 +589,14 @@
         }
       ],
       "createdAt": "2026-08-26T06:53:59.995Z",
-      "updatedAt": "2026-08-26T07:06:47.289Z"
+      "updatedAt": "2026-08-27T03:30:40.796Z"
     },
     {
       "id": "xp9cj0z9lmt9qp1lr",
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-040",
       "module": "Order Point",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Image 300x600",
       "steps": "1. Order item(s)\n2. Check the second display",
       "expectedResult": "Image reflected correctly",
@@ -578,7 +608,7 @@
         }
       ],
       "createdAt": "2026-08-26T06:55:31.935Z",
-      "updatedAt": "2026-08-26T07:06:50.817Z"
+      "updatedAt": "2026-08-27T03:30:44.221Z"
     },
     {
       "id": "xgy44hidkmt9r4rus",
