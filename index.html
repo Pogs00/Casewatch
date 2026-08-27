@@ -908,6 +908,14 @@ function openCopyModal(taskId){
   copySourceTaskId = taskId;
   const clientOptions = getClientList().filter(c => c.toLowerCase() !== t.client.toLowerCase());
 
+  const checklistHtml = clientOptions.length
+    ? clientOptions.map(c => `
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 2px; cursor:pointer;">
+          <input type="checkbox" class="copy-client-check" value="${escAttr(c)}">
+          ${escHtml(c)}
+        </label>`).join('')
+    : `<div style="font-size:12.5px; color:var(--ink-dim); padding:4px 2px;">No other clients yet — add one below.</div>`;
+
   const html = `
   <div class="modal-backdrop" onclick="if(event.target===this) closeCopyModal()">
     <div class="modal modal-sm">
@@ -917,13 +925,18 @@ function openCopyModal(taskId){
       </div>
       <div class="modal-body">
         <p style="font-size:13px; color:var(--ink-dim); margin-top:0; line-height:1.5;">
-          Copy <strong>${escHtml(t.idNumber)} — ${escHtml(t.module)}</strong> from <strong>${escHtml(t.client)}</strong> to another client.
-          The copy gets a fresh auto-generated ID, its status resets, and remarks aren't carried over.
+          Copy <strong>${escHtml(t.idNumber)} — ${escHtml(t.module)}</strong> from <strong>${escHtml(t.client)}</strong> to one or more other clients.
+          Each copy gets a fresh auto-generated ID, its status resets, and remarks aren't carried over.
         </p>
         <div class="field">
-          <label>Target client</label>
-          <input type="text" id="copy_client" list="copyClientOptions" placeholder="e.g. Globex Inc" onkeydown="if(event.key==='Enter') performCopy()">
-          <datalist id="copyClientOptions">${clientOptions.map(c=>`<option value="${escAttr(c)}">`).join('')}</datalist>
+          <label>Copy to clients</label>
+          <div id="copyClientChecks" style="display:flex; flex-direction:column; max-height:180px; overflow:auto; border:1px solid var(--border); border-radius:8px; padding:6px 8px;">
+            ${checklistHtml}
+          </div>
+        </div>
+        <div class="field">
+          <label>New client(s) <span style="font-weight:400; color:var(--ink-dim);">(comma-separated, optional)</span></label>
+          <input type="text" id="copy_new_clients" placeholder="e.g. Initech, Umbrella Corp" onkeydown="if(event.key==='Enter') performCopy()">
         </div>
       </div>
       <div class="modal-foot">
@@ -933,8 +946,10 @@ function openCopyModal(taskId){
     </div>
   </div>`;
   document.getElementById('modalRoot').innerHTML = html;
-  const inp = document.getElementById('copy_client');
-  if(inp) inp.focus();
+  const firstCheck = document.querySelector('.copy-client-check');
+  const newClientsInp = document.getElementById('copy_new_clients');
+  if(firstCheck) firstCheck.focus();
+  else if(newClientsInp) newClientsInp.focus();
 }
 
 function closeCopyModal(){
@@ -943,32 +958,54 @@ function closeCopyModal(){
 }
 
 function performCopy(){
-  const inp = document.getElementById('copy_client');
-  const target = inp ? inp.value.trim() : '';
-  if(!target){ toast('Enter a target client', 'err'); return; }
   const t = tasks.find(x=>x.id===copySourceTaskId);
   if(!t) return;
-  if(target.toLowerCase() === t.client.toLowerCase()){
-    toast('Choose a different client to copy to', 'err');
-    return;
-  }
+
+  const checked = Array.from(document.querySelectorAll('.copy-client-check:checked')).map(cb => cb.value);
+  const newClientsRaw = document.getElementById('copy_new_clients').value;
+  const typedClients = newClientsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+  // Merge, de-duplicate case-insensitively, and drop the source client if
+  // it somehow got typed into the "new clients" box.
+  const seen = new Set();
+  const targets = [];
+  [...checked, ...typedClients].forEach(name=>{
+    const key = name.toLowerCase();
+    if(key === t.client.toLowerCase()) return;
+    if(seen.has(key)) return;
+    seen.add(key);
+    targets.push(name);
+  });
+
+  if(!targets.length){ toast('Select or enter at least one target client', 'err'); return; }
+
   const now = new Date().toISOString();
   const notStarted = statuses.find(s=>s.id==='notstarted');
   const initialStatus = notStarted ? notStarted.id : (statuses[0] ? statuses[0].id : t.status);
-  const newId = nextIdForClient(target);
 
-  tasks.push({
-    id: uid(), client: target, idNumber: newId, module: t.module,
-    description: t.description, steps: t.steps, expectedResult: t.expectedResult,
-    status: initialStatus, remarks: [], createdAt: now, updatedAt: now
+  const newIds = [];
+  targets.forEach(target=>{
+    const newId = nextIdForClient(target);
+    tasks.push({
+      id: uid(), client: target, idNumber: newId, module: t.module,
+      description: t.description, steps: t.steps, expectedResult: t.expectedResult,
+      status: initialStatus, remarks: [], createdAt: now, updatedAt: now
+    });
+    newIds.push(`${target} (${newId})`);
+
+    if(extraClients.some(c => c.toLowerCase() === target.toLowerCase())){
+      extraClients = extraClients.filter(c => c.toLowerCase() !== target.toLowerCase());
+    }
   });
 
-  if(extraClients.some(c => c.toLowerCase() === target.toLowerCase())){
-    extraClients = extraClients.filter(c => c.toLowerCase() !== target.toLowerCase());
-    persistClients();
-  }
+  persistClients();
   persistTasks();
-  toast(`Copied to ${target} as ${newId}`, 'ok');
+  toast(
+    targets.length === 1
+      ? `Copied to ${newIds[0]}`
+      : `Copied to ${targets.length} clients: ${newIds.join(', ')}`,
+    'ok'
+  );
   closeCopyModal();
   render();
 }
@@ -1572,9 +1609,58 @@ function exportReportPDF(orientation){
     }
   });
 
+  const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || y;
+  addSignoffSection(doc, finalY, marginX);
+
   const pdfSlug = (settings.appName || 'CaseWatch').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'casewatch';
   doc.save(`${pdfSlug}-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.pdf`);
   toast(`PDF report generated (${orientation})`, 'ok');
+}
+
+// Adds a "Name / Signature / Date" sign-off block for UAT confirmation at
+// the end of the report, starting just below the results table. Pushes to
+// a new page first if there isn't enough room left on the current one.
+function addSignoffSection(doc, startY, marginX){
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const blockHeight = 120;
+  let y = startY + 34;
+
+  if(y + blockHeight > pageHeight - 40){
+    doc.addPage();
+    y = 50;
+  }
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.setTextColor(20);
+  doc.text('UAT Confirmation & Sign-off', marginX, y);
+  y += 8;
+  doc.setDrawColor(210);
+  doc.setLineWidth(0.75);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 22;
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(70);
+  doc.text('By signing below, the undersigned confirms that the test cases listed in this report have been reviewed and the results are accepted.', marginX, y, {maxWidth: pageWidth - marginX*2});
+  y += 34;
+
+  const colGap = 24;
+  const colWidth = (pageWidth - marginX*2 - colGap*2) / 3;
+  const labels = ['Name','Signature','Date'];
+  const lineY = y + 32;
+  labels.forEach((label, i)=>{
+    const x = marginX + i*(colWidth+colGap);
+    doc.setDrawColor(140);
+    doc.setLineWidth(0.75);
+    doc.line(x, lineY, x+colWidth, lineY);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    doc.setTextColor(90);
+    doc.text(label, x, lineY + 14);
+  });
 }
 
 function hexToRgb(hex){
