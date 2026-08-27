@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-27T09:19:14.270Z",
+  "exportedAt": "2026-08-27T09:24:01.897Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -187,7 +187,7 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-014",
       "module": "Discount",
-      "status": "retest",
+      "status": "failed",
       "description": "Apply a National Athletes and Coaches discount",
       "steps": "1. Add item(s) worth P1120 (For easy testing)\n3. Select the order mode\n2. Apply NAAC using discount button\n3. Enter the NAAC details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
@@ -201,10 +201,15 @@
           "id": "xtk20kjxemtb58joj",
           "text": "Still has error, Presentation with issue there's an name attached even without adding",
           "ts": "2026-08-27T06:30:22.627Z"
+        },
+        {
+          "id": "xuullebbamtbbezt8",
+          "text": "Still with error even after changing the settings to the same setting in another store",
+          "ts": "2026-08-27T09:23:21.164Z"
         }
       ],
       "createdAt": "2026-08-26T05:47:51.484Z",
-      "updatedAt": "2026-08-27T06:30:23.915Z"
+      "updatedAt": "2026-08-27T09:23:22.412Z"
     },
     {
       "id": "xma4sx3lxmt9oaoho",
