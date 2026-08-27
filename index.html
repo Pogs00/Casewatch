@@ -157,6 +157,14 @@
   .search-wrap input{width:100%; padding-left:30px;}
   .filter-spacer{flex:1;}
 
+  /* ---------- Bulk selection bar ---------- */
+  .bulk-bar{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    background:var(--accent-soft, #eef1ff); border:1px solid var(--accent, #3454d1);
+    border-radius:10px; padding:9px 12px; margin-bottom:14px;
+  }
+  .bulk-count{ font-size:12.5px; font-weight:700; color:var(--accent, #3454d1); margin-right:2px; }
+
   /* ---------- Table ---------- */
   table{width:100%; border-collapse:collapse; font-size:13px;}
   thead th{
@@ -166,6 +174,9 @@
   tbody td{padding:11px 14px; border-bottom:1px solid #eceff5; vertical-align:top;}
   tbody tr{cursor:pointer;}
   tbody tr:hover{background:var(--panel-2);}
+  tbody tr.row-selected{background:var(--accent-soft, #eef1ff);}
+  th.cell-check, td.cell-check{width:34px; padding-left:14px; padding-right:0;}
+  .row-check{width:15px; height:15px; cursor:pointer; accent-color:var(--accent, #3454d1);}
   .cell-id{font-family:var(--mono); font-weight:600; color:var(--ink);}
   .cell-desc{color:var(--ink-dim); max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .cell-client{color:var(--ink-dim);}
@@ -399,6 +410,7 @@ let currentClient = '__ALL__';
 let filterStatus = '__ALL__';
 let filterModule = '__ALL__';
 let searchTerm = '';
+let selectedTaskIds = new Set();
 
 function naturalCompare(a,b){
   return String(a).localeCompare(String(b), undefined, {numeric:true, sensitivity:'base'});
@@ -484,6 +496,7 @@ function toast(msg, kind){
    ========================================================= */
 function setView(v){
   view = v;
+  selectedTaskIds.clear();
   document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
     el.classList.toggle('active', el.dataset.view === v);
   });
@@ -822,7 +835,7 @@ function renderCasesView(){
 
   let rows = '';
   if(list.length === 0){
-    rows = `<tr><td colspan="6"><div class="empty-state">
+    rows = `<tr><td colspan="7"><div class="empty-state">
       ${iconInbox()}
       <h3>No test cases found</h3>
       <p>Try clearing filters, or add a new test case.</p>
@@ -832,7 +845,11 @@ function renderCasesView(){
     list.forEach(t=>{
       const st = statusById(t.status);
       const lastRemark = t.remarks && t.remarks.length ? t.remarks[t.remarks.length-1] : null;
-      rows += `<tr onclick="openTaskModal('${t.id}')">
+      const checked = selectedTaskIds.has(t.id);
+      rows += `<tr onclick="openTaskModal('${t.id}')" class="${checked ? 'row-selected' : ''}">
+        <td class="cell-check" onclick="event.stopPropagation()">
+          <input type="checkbox" class="row-check" ${checked ? 'checked' : ''} onchange="toggleSelectTask('${t.id}', this.checked)">
+        </td>
         <td class="cell-id">${escHtml(t.idNumber)}</td>
         ${currentClient==='__ALL__' ? `<td class="cell-client">${escHtml(t.client)}</td>` : ''}
         <td>${escHtml(t.module)}</td>
@@ -850,6 +867,11 @@ function renderCasesView(){
     });
   }
 
+  const visibleIds = list.map(t=>t.id);
+  const selectedVisibleCount = visibleIds.filter(id => selectedTaskIds.has(id)).length;
+  const allVisibleSelected = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
+  const selectedTotal = selectedTaskIds.size;
+
   return `
     <div class="filter-bar">
       <div class="search-wrap">
@@ -861,9 +883,18 @@ function renderCasesView(){
       <div class="filter-spacer"></div>
       <span style="font-size:12px; color:var(--ink-dim);">${list.length} shown</span>
     </div>
+    ${selectedTotal > 0 ? `
+    <div class="bulk-bar">
+      <span class="bulk-count">${selectedTotal} selected</span>
+      <button class="btn btn-primary btn-sm" onclick="openBulkCopyModal()">${iconCopy()} Copy to clients…</button>
+      <button class="btn btn-danger btn-sm" onclick="bulkDeleteSelected()">${iconTrash()} Delete selected</button>
+      <div class="filter-spacer"></div>
+      <button class="btn btn-sm" onclick="clearSelection()">Clear selection</button>
+    </div>` : ''}
     <div class="panel-block">
       <table>
         <thead><tr>
+          <th class="cell-check"><input type="checkbox" class="row-check" ${allVisibleSelected ? 'checked' : ''} onchange="toggleSelectAllVisible(this.checked)"></th>
           <th>ID Number</th>
           ${currentClient==='__ALL__' ? '<th>Client</th>' : ''}
           <th>Module</th>
@@ -876,6 +907,32 @@ function renderCasesView(){
       </table>
     </div>
   `;
+}
+
+function toggleSelectTask(id, checked){
+  if(checked) selectedTaskIds.add(id); else selectedTaskIds.delete(id);
+  render();
+}
+function toggleSelectAllVisible(checked){
+  filteredTasks().forEach(t=>{
+    if(checked) selectedTaskIds.add(t.id); else selectedTaskIds.delete(t.id);
+  });
+  render();
+}
+function clearSelection(){
+  selectedTaskIds.clear();
+  render();
+}
+function bulkDeleteSelected(){
+  const ids = Array.from(selectedTaskIds).filter(id => tasks.some(t=>t.id===id));
+  if(!ids.length) return;
+  const label = ids.length === 1 ? '1 test case' : `${ids.length} test cases`;
+  if(!confirm(`Delete ${label}? This cannot be undone.`)) return;
+  tasks = tasks.filter(t => !ids.includes(t.id));
+  selectedTaskIds.clear();
+  persistTasks();
+  toast(`${label} deleted`, 'ok');
+  render();
 }
 
 let searchDebounce = null;
@@ -900,13 +957,30 @@ function deleteTask(id){
 }
 
 /* =========================================================
-   COPY TEST CASE TO ANOTHER CLIENT
+   COPY TEST CASE(S) TO ANOTHER CLIENT
    ========================================================= */
 function openCopyModal(taskId){
   const t = tasks.find(x=>x.id===taskId);
   if(!t) return;
-  copySourceTaskId = taskId;
-  const clientOptions = getClientList().filter(c => c.toLowerCase() !== t.client.toLowerCase());
+  copySourceTaskIds = [taskId];
+  renderCopyModal();
+}
+
+function openBulkCopyModal(){
+  const ids = Array.from(selectedTaskIds).filter(id => tasks.some(t=>t.id===id));
+  if(!ids.length){ toast('Select at least one test case first', 'err'); return; }
+  copySourceTaskIds = ids;
+  renderCopyModal();
+}
+
+function renderCopyModal(){
+  const sources = copySourceTaskIds.map(id => tasks.find(x=>x.id===id)).filter(Boolean);
+  if(!sources.length) return;
+
+  // Excludes a client only if every selected test case already belongs to it —
+  // with a mixed multi-client selection there's no client to hide.
+  const sourceClients = new Set(sources.map(s => s.client.toLowerCase()));
+  const clientOptions = getClientList().filter(c => !(sourceClients.size === 1 && sourceClients.has(c.toLowerCase())));
 
   const checklistHtml = clientOptions.length
     ? clientOptions.map(c => `
@@ -916,16 +990,20 @@ function openCopyModal(taskId){
         </label>`).join('')
     : `<div style="font-size:12.5px; color:var(--ink-dim); padding:4px 2px;">No other clients yet — add one below.</div>`;
 
+  const introHtml = sources.length === 1
+    ? `Copy <strong>${escHtml(sources[0].idNumber)} — ${escHtml(sources[0].module)}</strong> from <strong>${escHtml(sources[0].client)}</strong> to one or more other clients.`
+    : `Copy <strong>${sources.length} selected test cases</strong> to one or more other clients.`;
+
   const html = `
   <div class="modal-backdrop" onclick="if(event.target===this) closeCopyModal()">
     <div class="modal modal-sm">
       <div class="modal-head">
-        <h2>Copy test case</h2>
+        <h2>${sources.length === 1 ? 'Copy test case' : `Copy ${sources.length} test cases`}</h2>
         <button class="icon-btn" onclick="closeCopyModal()">✕</button>
       </div>
       <div class="modal-body">
         <p style="font-size:13px; color:var(--ink-dim); margin-top:0; line-height:1.5;">
-          Copy <strong>${escHtml(t.idNumber)} — ${escHtml(t.module)}</strong> from <strong>${escHtml(t.client)}</strong> to one or more other clients.
+          ${introHtml}
           Each copy gets a fresh auto-generated ID, its status resets, and remarks aren't carried over.
         </p>
         <div class="field">
@@ -941,7 +1019,7 @@ function openCopyModal(taskId){
       </div>
       <div class="modal-foot">
         <button class="btn" onclick="closeCopyModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="performCopy()">${iconCopy()} Copy test case</button>
+        <button class="btn btn-primary" onclick="performCopy()">${iconCopy()} ${sources.length === 1 ? 'Copy test case' : 'Copy test cases'}</button>
       </div>
     </div>
   </div>`;
@@ -954,24 +1032,22 @@ function openCopyModal(taskId){
 
 function closeCopyModal(){
   document.getElementById('modalRoot').innerHTML = '';
-  copySourceTaskId = null;
+  copySourceTaskIds = [];
 }
 
 function performCopy(){
-  const t = tasks.find(x=>x.id===copySourceTaskId);
-  if(!t) return;
+  const sources = copySourceTaskIds.map(id => tasks.find(x=>x.id===id)).filter(Boolean);
+  if(!sources.length) return;
 
   const checked = Array.from(document.querySelectorAll('.copy-client-check:checked')).map(cb => cb.value);
   const newClientsRaw = document.getElementById('copy_new_clients').value;
   const typedClients = newClientsRaw.split(',').map(s => s.trim()).filter(Boolean);
 
-  // Merge, de-duplicate case-insensitively, and drop the source client if
-  // it somehow got typed into the "new clients" box.
+  // De-duplicate target client names case-insensitively.
   const seen = new Set();
   const targets = [];
   [...checked, ...typedClients].forEach(name=>{
     const key = name.toLowerCase();
-    if(key === t.client.toLowerCase()) return;
     if(seen.has(key)) return;
     seen.add(key);
     targets.push(name);
@@ -981,31 +1057,37 @@ function performCopy(){
 
   const now = new Date().toISOString();
   const notStarted = statuses.find(s=>s.id==='notstarted');
-  const initialStatus = notStarted ? notStarted.id : (statuses[0] ? statuses[0].id : t.status);
 
-  const newIds = [];
+  let copyCount = 0;
   targets.forEach(target=>{
-    const newId = nextIdForClient(target);
-    tasks.push({
-      id: uid(), client: target, idNumber: newId, module: t.module,
-      description: t.description, steps: t.steps, expectedResult: t.expectedResult,
-      status: initialStatus, remarks: [], createdAt: now, updatedAt: now
+    sources.forEach(t=>{
+      // Skip copying a test case onto the client it already belongs to.
+      if(target.toLowerCase() === t.client.toLowerCase()) return;
+      const initialStatus = notStarted ? notStarted.id : (statuses[0] ? statuses[0].id : t.status);
+      const newId = nextIdForClient(target);
+      tasks.push({
+        id: uid(), client: target, idNumber: newId, module: t.module,
+        description: t.description, steps: t.steps, expectedResult: t.expectedResult,
+        status: initialStatus, remarks: [], createdAt: now, updatedAt: now
+      });
+      copyCount++;
     });
-    newIds.push(`${target} (${newId})`);
-
     if(extraClients.some(c => c.toLowerCase() === target.toLowerCase())){
       extraClients = extraClients.filter(c => c.toLowerCase() !== target.toLowerCase());
     }
   });
 
+  if(!copyCount){ toast('Nothing to copy — every selected case already belongs to the chosen client(s)', 'err'); return; }
+
   persistClients();
   persistTasks();
   toast(
-    targets.length === 1
-      ? `Copied to ${newIds[0]}`
-      : `Copied to ${targets.length} clients: ${newIds.join(', ')}`,
+    copyCount === 1
+      ? `Copied 1 test case to ${targets.length === 1 ? targets[0] : targets.length + ' clients'}`
+      : `Copied ${copyCount} test cases to ${targets.length === 1 ? targets[0] : targets.length + ' clients'}`,
     'ok'
   );
+  selectedTaskIds.clear();
   closeCopyModal();
   render();
 }
@@ -1016,7 +1098,7 @@ function performCopy(){
 let editingTaskId = null;
 let draftRemarks = [];
 let idAutoFilled = false;
-let copySourceTaskId = null;
+let copySourceTaskIds = [];
 
 function openTaskModal(id){
   editingTaskId = id || null;
