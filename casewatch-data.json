@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-27T09:24:01.897Z",
+  "exportedAt": "2026-08-28T01:46:46.214Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -543,13 +543,13 @@
       "client": "Torikizoku Serendra",
       "idNumber": "TS-001",
       "module": "System Configuration",
-      "status": "notstarted",
+      "status": "passed",
       "description": "Installation of Aloha",
       "steps": "",
       "expectedResult": "Working aloha POS",
       "remarks": [],
       "createdAt": "2026-08-26T06:15:37.463Z",
-      "updatedAt": "2026-08-26T06:15:37.463Z"
+      "updatedAt": "2026-08-28T01:42:07.113Z"
     },
     {
       "id": "xkqirc8zsmt9pi6tg",
@@ -559,10 +559,16 @@
       "description": "Installation of KDS",
       "steps": "",
       "expectedResult": "Working KDS, Order from POS is sending correctly",
-      "status": "notstarted",
-      "remarks": [],
+      "status": "passed",
+      "remarks": [
+        {
+          "id": "x3ey3n7yomtcae62o",
+          "text": "Customize KDS for EHG Japan",
+          "ts": "2026-08-28T01:42:29.184Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:22:12.484Z",
-      "updatedAt": "2026-08-26T06:22:12.484Z"
+      "updatedAt": "2026-08-28T01:42:33.784Z"
     },
     {
       "id": "xkqzi1j8bmt9pid6l",
@@ -572,10 +578,16 @@
       "description": "Installation of menuX®",
       "steps": "",
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
-      "status": "notstarted",
-      "remarks": [],
+      "status": "passed",
+      "remarks": [
+        {
+          "id": "xfyxea5p4mtcaeh00",
+          "text": "Tablet and QR",
+          "ts": "2026-08-28T01:42:43.344Z"
+        }
+      ],
       "createdAt": "2026-08-26T06:22:20.732Z",
-      "updatedAt": "2026-08-26T06:22:20.732Z"
+      "updatedAt": "2026-08-28T01:42:43.824Z"
     },
     {
       "id": "xlwp07drdmt9qcf60",
@@ -818,10 +830,10 @@
       "description": "Cashier login with valid credentials",
       "steps": "1. Launch POS application\n2. Enter valid username/PIN",
       "expectedResult": "User is authenticated and the cashier can now access the cash drawer function for cash fund validation",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:22.973Z",
-      "updatedAt": "2026-08-27T07:37:22.973Z"
+      "updatedAt": "2026-08-28T01:42:51.092Z"
     },
     {
       "id": "xggtq3ofnmtb7msto",
@@ -831,10 +843,10 @@
       "description": "Login with invalid credentials is rejected",
       "steps": "1. Launch POS application\n2. Enter invalid PIN",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:26.892Z",
-      "updatedAt": "2026-08-27T07:37:26.892Z"
+      "updatedAt": "2026-08-28T01:42:54.412Z"
     },
     {
       "id": "x04dn9d8vmtb7muxh",
@@ -844,10 +856,10 @@
       "description": "Enter a cash fund",
       "steps": "1. Click the assign drawer button\n2. Tap add cash fund\n3. Enter amount of the cash fund",
       "expectedResult": "Amount will be added to the drawer successfully",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:29.621Z",
-      "updatedAt": "2026-08-27T07:37:29.621Z"
+      "updatedAt": "2026-08-28T01:42:57.420Z"
     },
     {
       "id": "xslj947nbmtb7mxa4",
@@ -857,10 +869,10 @@
       "description": "Process a single-item cash sale",
       "steps": "1. Select one product\n2. Select the order mode\n3. Click Pay\n4. Select Cash tender\n5. Enter amount tendered\n6. Transaction will be complete",
       "expectedResult": "Sale completes; Drawer will open and the change due calculated correctly; receipt is generated.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:32.668Z",
-      "updatedAt": "2026-08-27T07:37:32.668Z"
+      "updatedAt": "2026-08-28T01:43:00.364Z"
     },
     {
       "id": "xv9frqw6jmtb7n4is",
@@ -870,10 +882,10 @@
       "description": "Process a multi-item sale with card payment",
       "steps": "1. Select 3 different products\n2. Select the order mode\n3. Click Pay\n4. Select Card/e-wallet tender\n5. Transaction will be complete",
       "expectedResult": "Total reflects sum of item prices + tax; payment approved (maya terminal); receipt itemizes all products.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:42.052Z",
-      "updatedAt": "2026-08-27T07:37:42.052Z"
+      "updatedAt": "2026-08-28T01:43:02.596Z"
     },
     {
       "id": "x5zv1rm43mtb7n7l6",
@@ -883,10 +895,10 @@
       "description": "Process a split-tender payment (cash + card)",
       "steps": "1. Add item(s)\n2. Select the order mode\n2. Click Pay\n3. Enter partial cash amount\n4. Apply remaining balance to card/QR",
       "expectedResult": "Both tenders are recorded against the transaction; receipt shows itemized payment breakdown.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:46.025Z",
-      "updatedAt": "2026-08-27T07:37:46.025Z"
+      "updatedAt": "2026-08-28T01:43:05.612Z"
     },
     {
       "id": "xm5elzichmtb7naox",
@@ -896,10 +908,10 @@
       "description": "Apply a percentage discount to a transaction",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply 10% discount using discount button\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; tax recalculates on discounted amount; receipt shows discount line.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:50.049Z",
-      "updatedAt": "2026-08-27T07:37:50.049Z"
+      "updatedAt": "2026-08-28T01:43:09.044Z"
     },
     {
       "id": "x25r5fe5cmtb7ndoh",
@@ -909,10 +921,10 @@
       "description": "Apply an amount off discount to a transaction",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply 30 off discount using discount button\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; tax recalculates on discounted amount; receipt shows discount line.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:53.920Z",
-      "updatedAt": "2026-08-27T07:37:53.920Z"
+      "updatedAt": "2026-08-28T01:43:17.164Z"
     },
     {
       "id": "xd1fmg01smtb7nh5d",
@@ -922,10 +934,10 @@
       "description": "Apply a senior citizen discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply SCD using discount button\n3. Enter the senior details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T07:37:58.417Z",
-      "updatedAt": "2026-08-27T07:37:58.417Z"
+      "updatedAt": "2026-08-28T01:43:14.700Z"
     },
     {
       "id": "xnujwrv5omtb7nk4h",
@@ -935,10 +947,10 @@
       "description": "Apply a PWD discount",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply PWD using discount button\n3. Enter the PWD details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details and breakdown reflecting the transaction as VAT Exempted; printed 2 copy 1 for customer and 1 for accounting.",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T07:38:02.273Z",
-      "updatedAt": "2026-08-27T07:38:02.273Z"
+      "updatedAt": "2026-08-28T01:43:20.404Z"
     },
     {
       "id": "xmpovcqscmtb7nphu",
@@ -948,10 +960,10 @@
       "description": "Apply a National Athletes and Coaches discount",
       "steps": "1. Add item(s) worth P1120 (For easy testing)\n3. Select the order mode\n2. Apply NAAC using discount button\n3. Enter the NAAC details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T07:38:09.234Z",
-      "updatedAt": "2026-08-27T07:38:09.234Z"
+      "updatedAt": "2026-08-28T01:43:23.868Z"
     },
     {
       "id": "xirnzfqj7mtb8rsd3",
@@ -961,10 +973,10 @@
       "description": "Apply a Solo parent discount if applicable, skip if not",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply Solo Parent discount using discount button\n3. Enter the SP details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment\nNote:\nSolo parent discount may differ depending on cities",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:28.820Z"
     },
     {
       "id": "xsbkbmm90mtb8rsd3",
@@ -974,10 +986,10 @@
       "description": "Apply Diplomat",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply Diplomat using discount button and navigate to zero rated\n3. Enter the Diplomat details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Zero rated is applied correctly to subtotal; receipt shows line removing the VAT, customer details and breakdown reflecting the transaction as zero rated;",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:32.780Z"
     },
     {
       "id": "xb6oszjgmmtb8rsd3",
@@ -987,10 +999,10 @@
       "description": "Apply PEZA if applicable, skip if not",
       "steps": "1. Add item(s)\n3. Select the order mode\n2. Apply PEZA using discount button and navigate to zero rated\n3. Enter the manager code to proceed\n4. Proceed to payment",
       "expectedResult": "Zero rated is applied correctly to subtotal; receipt shows line removing the VAT, customer details and breakdown reflecting the transaction as zero rated;",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:36.172Z"
     },
     {
       "id": "x03y1n35mmtb8rsd3",
@@ -1000,10 +1012,10 @@
       "description": "Process a void transaction - Not yet send to the kitchen",
       "steps": "1. Add item(s)\n2. Item still in blue color\n2. Tap the item\n3. Click Delete or Void",
       "expectedResult": "Transaction will be voided, voided item will display with gray font color",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:40.148Z"
     },
     {
       "id": "xv6r5x01qmtb8rsd3",
@@ -1013,10 +1025,10 @@
       "description": "Process a full void - Completed transaction with receipt",
       "steps": "1. Open the manager function\n2. Click the reopen close check button\n3. Navigate to the receipt based on order number or check number\n4. Click OK\n5. Transaction will be re-opened\n6. Click delete all button to void",
       "expectedResult": "Refund receipt printed with negative amount matches the original sale and item price; refund posted the original payment method; refund print out print successfully",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:42.724Z"
     },
     {
       "id": "xaf06iifxmtb8rsd3",
@@ -1026,10 +1038,10 @@
       "description": "Reprint customer receipt",
       "steps": "1. Complete a sale\n2. Open the Manager function\n3. Click to reprint\n4. Select the completed transaction\n5. Click OK to print",
       "expectedResult": "Original receipt prints correctly; reprinted receipt is clearly marked as a reprinted.",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:46.372Z"
     },
     {
       "id": "x5wr0xsusmtb8rsd3",
@@ -1039,10 +1051,10 @@
       "description": "Set the item availability",
       "steps": "1. Navigate to Manager function\n2. Select the item availability \n3. click the category and item\n4. Add or remove the available count",
       "expectedResult": "Original stock will change successfully, unavailable item will be available",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:43:55.552Z"
     },
     {
       "id": "xn7zaqgk9mtb8rsd3",
@@ -1052,10 +1064,10 @@
       "description": "View and print sales summary, Hourly Sales, Product Mix",
       "steps": "1. Click the manager function\n2. All reports will be displayed\n3. Click the report to view\n4. Click the print button to print the report",
       "expectedResult": "Sales summary or product mix or hourly sales shows successfully",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:00.202Z"
     },
     {
       "id": "x9rmuc1timtb8rsd3",
@@ -1065,10 +1077,10 @@
       "description": "Checkout process",
       "steps": "1. Login cashier\n2. Click the Checkout button\n3. Open the drawer and count manually\n4. Enter the amount for reconciliation\n5. X reading will print showing the shortage or overage",
       "expectedResult": "System calculates and displays variance (if any); shift report is generated and stored. X reading will print successfully",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:03.769Z"
     },
     {
       "id": "xb5dh2vxfmtb8rsd4",
@@ -1078,10 +1090,10 @@
       "description": "End-of-day process",
       "steps": "1. Navigate to manager function\n2. Click the EOD button\n3. Enter the manager code to proceed\n4. Confirmation will pop-up\n5. Click OK to proceed",
       "expectedResult": "System run the end of day and will automatically change the date to next day, Z reading will print successfully",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:10.779Z"
     },
     {
       "id": "xsxopsbl1mtb8rsd4",
@@ -1091,10 +1103,10 @@
       "description": "Ejournal validation",
       "steps": "1. Navigate to drive c:\n2. Look for Bootdrv\\AlohaQS folder\n3. Look for Ejournal folder\n4. Open the Ejournal folder and check Ejournal textfile",
       "expectedResult": "Ejournal created successfully every transaction; compose of closed transaction, voided transaction, refunded transaction, X reading, and Z reading",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:14.329Z"
     },
     {
       "id": "xgee0x62rmtb8rsd4",
@@ -1104,10 +1116,16 @@
       "description": "Login by touching the SOK screen",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap Login\n3. Select the order mode",
       "expectedResult": "Successfully enter the order mode screen (dine in or take out)",
-      "status": "notstarted",
-      "remarks": [],
+      "status": "passed",
+      "remarks": [
+        {
+          "id": "xp8nxn922mtcags8h",
+          "text": "Tablet login by swiping up",
+          "ts": "2026-08-28T01:44:31.217Z"
+        }
+      ],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:35.001Z"
     },
     {
       "id": "x0rh5mcb7mtb8rsd4",
@@ -1117,10 +1135,10 @@
       "description": "Process a single item as cash sale (payment at the counter)",
       "steps": "1. Select one product in any menu category\n2. Tap add to cart\n3. Click view order to validate the order\n4. Select confirm and proceed to the payment page\n5. Select the payment method\n6. Complete the transaction",
       "expectedResult": "Sale completes; Order slip printed, guest will go to cashier to pay",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:44:43.984Z"
     },
     {
       "id": "xyugsauxkmtb8rsd4",
@@ -1130,10 +1148,16 @@
       "description": "Recall order in the POS",
       "steps": "1. Launch POS application\n2. Enter valid username/PIN\n3. Navigate to first panel and click kiosk order\n4. Kiosk order box will pop-up\n5. Select the order number and click ok\n6. Navigate to Recall button\n7. Click the SOK box and select the recalled order\n8. Proceed to discount if needed, and pay",
       "expectedResult": "Order successfully recalled",
-      "status": "notstarted",
-      "remarks": [],
+      "status": "passed",
+      "remarks": [
+        {
+          "id": "xcgpz0m6dmtcahjtx",
+          "text": "Auto for TS in a preset table number",
+          "ts": "2026-08-28T01:45:06.981Z"
+        }
+      ],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:07.653Z"
     },
     {
       "id": "x837y3rlgmtb8rsd4",
@@ -1143,10 +1167,10 @@
       "description": "Process a Combo-item as no-cash sale (card or e-wallet)",
       "steps": "1. Select one product in any menu category\n2. Tap add to cart\n3. Click view order to validate the order\n4. Select confirm and proceed to the payment page\n5. Select the payment method\n6. Complete the transaction",
       "expectedResult": "Sale completes; Sales invoice printed; guest will wait for the order complete for pickup",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:14.365Z"
     },
     {
       "id": "xbh23x6uomtb8rsd4",
@@ -1156,10 +1180,10 @@
       "description": "Start-up Ads",
       "steps": "1. Launch SOK application (automatic upon open)",
       "expectedResult": "Ads successfully reflected",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:18.888Z"
     },
     {
       "id": "xhz7j9aypmtb8rsd4",
@@ -1169,10 +1193,10 @@
       "description": "Banner Ads",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)",
       "expectedResult": "Banners successfully reflected",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:22.477Z"
     },
     {
       "id": "xgxawml3umtb8rsd4",
@@ -1182,10 +1206,10 @@
       "description": "New item banner (featured product)",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)",
       "expectedResult": "New item images successfully reflected in the first screen",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:27.748Z"
     },
     {
       "id": "x0vxev7a9mtb8rsd4",
@@ -1195,10 +1219,10 @@
       "description": "Upselling",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)\n5. Select one product in any menu category\n6. Tap add to cart\n7. Select item in the upsell pop-up",
       "expectedResult": "Upselling successfully shown items pre-selected by the store",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:31.165Z"
     },
     {
       "id": "xltrd730omtb8rsd4",
@@ -1208,10 +1232,10 @@
       "description": "Recommendation",
       "steps": "1. Launch SOK application (automatic upon open)\n2. Tap to login\n3. Select the order mode\n4. Navigate the ordering page (category and items page)\n5. Select one product in any menu category\n6. Tap add to cart\n7. Select item in the upsell pop-up\n8. Click view order to validate the order\n9. Select the recommended item in the carousel",
       "expectedResult": "Recommendation successfully shown items pre-selected by the store",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:34.853Z"
     },
     {
       "id": "xmju3wruumtb8rsd4",
@@ -1221,10 +1245,10 @@
       "description": "Display item",
       "steps": "1. Order from the POS sync to the KDS depending on the configuration (on the fly or afer payment)",
       "expectedResult": "Item reflected in the KDS is correct",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:44.508Z"
     },
     {
       "id": "x4s8x9w0mmtb8rsd4",
@@ -1234,10 +1258,10 @@
       "description": "Color coding",
       "steps": "1. Wait for the order to determine the color-coding if working",
       "expectedResult": "Color coding reflected properly per added time (Gray, Yellow and Red)",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:47.836Z"
     },
     {
       "id": "xmimvv9ftmtb8rsd4",
@@ -1247,10 +1271,10 @@
       "description": "Bumping",
       "steps": "1. Touch the item in the KDS to bump",
       "expectedResult": "Item bump properly and removed to the monitor",
-      "status": "notstarted",
+      "status": "passed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:50.825Z"
     },
     {
       "id": "x0juisa5xmtb8rsd4",
@@ -1260,10 +1284,10 @@
       "description": "Queue Monitor design and display",
       "steps": "1. Validate if the logo is correct\n2. Validate if the color is correct\n3. Validate if the item once bump change from in progress to ready",
       "expectedResult": "Order is reflected correctly, under in progress and ready",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:55.865Z"
     },
     {
       "id": "xnueh9r7fmtb8rsd4",
@@ -1273,10 +1297,10 @@
       "description": "Image 800x600",
       "steps": "1. Check the second display while in idle mode",
       "expectedResult": "Image is reflected correctly",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:45:59.960Z"
     },
     {
       "id": "xs1qbp4pkmtb8rsd4",
@@ -1286,10 +1310,10 @@
       "description": "Image 300x600",
       "steps": "1. Order item(s)\n2. Check the second display",
       "expectedResult": "Image reflected correctly",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:02.417Z"
     },
     {
       "id": "xprqq42ramtb8rsd4",
@@ -1299,10 +1323,10 @@
       "description": "Display",
       "steps": "",
       "expectedResult": "Display the correct menu",
-      "status": "notstarted",
+      "status": "xvir2m0zamt9qqvzd",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:05.259Z"
     },
     {
       "id": "xmrlt9c6fmtb8rsd4",
@@ -1312,10 +1336,10 @@
       "description": "Z Reading Report",
       "steps": "",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:09.091Z"
     },
     {
       "id": "xy6nlr0jpmtb8rsd4",
@@ -1325,10 +1349,10 @@
       "description": "Detailed Summary Report",
       "steps": "",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:11.537Z"
     },
     {
       "id": "x529bulbamtb8rsd4",
@@ -1338,10 +1362,10 @@
       "description": "Sales Summary Report",
       "steps": "",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:14.040Z"
     },
     {
       "id": "x9lw4ksj8mtb8rsd4",
@@ -1351,10 +1375,10 @@
       "description": "Void Report",
       "steps": "",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:16.627Z"
     },
     {
       "id": "xtnctze6lmtb8rsd4",
@@ -1364,10 +1388,10 @@
       "description": "Government Mandated Report (SCD, PWD, NACD, Diplomat)",
       "steps": "",
       "expectedResult": "",
-      "status": "notstarted",
+      "status": "failed",
       "remarks": [],
       "createdAt": "2026-08-27T08:09:19.191Z",
-      "updatedAt": "2026-08-27T08:09:19.191Z"
+      "updatedAt": "2026-08-28T01:46:19.680Z"
     }
   ],
   "statuses": [
