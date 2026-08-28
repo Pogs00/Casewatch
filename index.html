@@ -436,6 +436,12 @@ function nextIdForClient(client){
 
 function statusById(id){ return statuses.find(s=>s.id===id) || {id:'unknown', name:'Unknown', color:'#999'}; }
 
+function isNotApplicable(statusId){
+  const s = statusById(statusId);
+  const name = (s.name || '').toLowerCase();
+  return statusId === 'notapplicable' || name.includes('not applicable') || name === 'n/a';
+}
+
 function getClientList(){
   const set = new Set(tasks.map(t=>t.client).filter(Boolean));
   extraClients.forEach(c=>set.add(c));
@@ -656,6 +662,10 @@ function renderDashboard(){
     : baseList;
   const total = list.length;
 
+  // Exclude not applicable items from percentage counts
+  const effectiveList = list.filter(t => !isNotApplicable(t.status));
+  const effectiveTotal = effectiveList.length;
+
   const counts = {};
   statuses.forEach(s=>counts[s.id]=0);
   list.forEach(t=>{ counts[t.status] = (counts[t.status]||0) + 1; });
@@ -664,15 +674,15 @@ function renderDashboard(){
   let legendHtml = '';
   statuses.forEach(s=>{
     const c = counts[s.id]||0;
-    const pct = total ? (c/total*100) : 0;
-    if(pct>0) segHtml += `<div class="signal-seg" style="width:${pct}%; background:${s.color}" title="${escAttr(s.name)}: ${c}"></div>`;
+    const pct = effectiveTotal ? (c/effectiveTotal*100) : 0;
+    if(pct>0 && !isNotApplicable(s.id)) segHtml += `<div class="signal-seg" style="width:${pct}%; background:${s.color}" title="${escAttr(s.name)}: ${c}"></div>`;
     legendHtml += `<div class="signal-legend-item"><span class="legend-dot" style="background:${s.color}"></span>${escHtml(s.name)} <span class="legend-count">${c}</span></div>`;
   });
-  if(total===0){ segHtml = `<div class="signal-seg" style="width:100%; background:#e3e7ef"></div>`; }
+  if(effectiveTotal===0){ segHtml = `<div class="signal-seg" style="width:100%; background:#e3e7ef"></div>`; }
 
   const passedCount = counts['passed'] !== undefined ? counts['passed'] : 0;
   const failedCount = counts['failed'] !== undefined ? counts['failed'] : 0;
-  const passRate = total ? Math.round((passedCount/total)*100) : 0;
+  const passRate = effectiveTotal ? Math.round((passedCount/effectiveTotal)*100) : 0;
 
   let statCards = `
     <div class="stat-card ${filterStatus==='__ALL__'?'active':''}" onclick="goToCasesWithStatus('__ALL__')">
@@ -703,9 +713,10 @@ function renderDashboard(){
     let clientRows = '';
     clients.forEach(c=>{
       const cTasks = tasks.filter(t=>t.client===c);
-      const cPassed = cTasks.filter(t=>t.status==='passed').length;
+      const cEffective = cTasks.filter(t => !isNotApplicable(t.status));
+      const cPassed = cEffective.filter(t=>t.status==='passed').length;
       const sharePct = tasks.length ? Math.round((cTasks.length/tasks.length)*100) : 0;
-      const passPct = cTasks.length ? Math.round((cPassed/cTasks.length)*100) : 0;
+      const passPct = cEffective.length ? Math.round((cPassed/cEffective.length)*100) : 0;
       clientRows += `<tr onclick="goToDashboardClient('${escAttr(c)}')" style="cursor:pointer;">
         <td style="font-weight:600; white-space:nowrap;">${escHtml(c)}</td>
         <td class="cell-desc" style="max-width:none; white-space:nowrap;">${cTasks.length} case${cTasks.length!==1?'s':''}</td>
@@ -722,7 +733,7 @@ function renderDashboard(){
             <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
               <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
             </div>
-            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${cPassed}/${cTasks.length} passed (${passPct}%)</span>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${cPassed}/${cEffective.length} passed (${passPct}%)</span>
           </div>
         </td>
       </tr>`;
@@ -754,9 +765,10 @@ function renderDashboard(){
     let moduleRows = '';
     modules.forEach(m=>{
       const mTasks = baseList.filter(t=>t.module===m);
-      const mPassed = mTasks.filter(t=>t.status==='passed').length;
+      const mEffective = mTasks.filter(t => !isNotApplicable(t.status));
+      const mPassed = mEffective.filter(t=>t.status==='passed').length;
       const sharePct = baseList.length ? Math.round((mTasks.length/baseList.length)*100) : 0;
-      const passPct = mTasks.length ? Math.round((mPassed/mTasks.length)*100) : 0;
+      const passPct = mEffective.length ? Math.round((mPassed/mEffective.length)*100) : 0;
       const isActive = filterModule === m;
       moduleRows += `<tr onclick="filterModule='${escAttr(m)}'; render();" style="cursor:pointer; ${isActive ? 'background:var(--accent-soft);' : ''}">
         <td style="font-weight:600; white-space:nowrap;">${escHtml(m)}</td>
@@ -774,7 +786,7 @@ function renderDashboard(){
             <div style="width:80px; height:7px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden;">
               <div style="width:${passPct}%; height:100%; background:#2F9E44;"></div>
             </div>
-            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${mPassed}/${mTasks.length} passed (${passPct}%)</span>
+            <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);">${mPassed}/${mEffective.length} passed (${passPct}%)</span>
           </div>
         </td>
       </tr>`;
