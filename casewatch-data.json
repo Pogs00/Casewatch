@@ -1,7 +1,7 @@
 {
   "app": "CaseWatch",
   "version": 1,
-  "exportedAt": "2026-08-28T01:46:46.214Z",
+  "exportedAt": "2026-09-10T05:24:48.073Z",
   "tasks": [
     {
       "id": "xa5npi691mt9nflql",
@@ -34,7 +34,7 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-003",
       "module": "System Configuration",
-      "status": "failed",
+      "status": "passed",
       "description": "Installation of menuX®",
       "steps": "",
       "expectedResult": "Working SOK, sending order to POS and KDS, able to close order by paying at the counter or non-cash payments",
@@ -43,10 +43,15 @@
           "id": "x7h7ocgfbmtb7j0n4",
           "text": "Not installed yet",
           "ts": "2026-08-27T07:34:30.400Z"
+        },
+        {
+          "id": "xu7jgig84mtv2qver",
+          "text": "Installed 9/9",
+          "ts": "2026-09-10T05:16:02.307Z"
         }
       ],
       "createdAt": "2026-08-26T05:26:01.008Z",
-      "updatedAt": "2026-08-27T07:34:32.736Z"
+      "updatedAt": "2026-09-10T05:16:03.275Z"
     },
     {
       "id": "xsmt53c61mt9nvlfv",
@@ -187,7 +192,7 @@
       "client": "Lets Eat Rockwell Pasig",
       "idNumber": "LE-014",
       "module": "Discount",
-      "status": "failed",
+      "status": "passed",
       "description": "Apply a National Athletes and Coaches discount",
       "steps": "1. Add item(s) worth P1120 (For easy testing)\n3. Select the order mode\n2. Apply NAAC using discount button\n3. Enter the NAAC details (name and number)\n4. Enter the manager code to proceed\n5. Proceed to payment",
       "expectedResult": "Discount is applied correctly to subtotal; receipt shows discount line, customer details;",
@@ -206,10 +211,15 @@
           "id": "xuullebbamtbbezt8",
           "text": "Still with error even after changing the settings to the same setting in another store",
           "ts": "2026-08-27T09:23:21.164Z"
+        },
+        {
+          "id": "xzjfa1lhrmtv2rqb7",
+          "text": "Fixed NACD 9/4",
+          "ts": "2026-09-10T05:16:42.355Z"
         }
       ],
       "createdAt": "2026-08-26T05:47:51.484Z",
-      "updatedAt": "2026-08-27T09:23:22.412Z"
+      "updatedAt": "2026-09-10T05:16:49.099Z"
     },
     {
       "id": "xma4sx3lxmt9oaoho",
@@ -345,7 +355,7 @@
         }
       ],
       "createdAt": "2026-08-26T06:00:22.892Z",
-      "updatedAt": "2026-08-27T07:35:07.588Z"
+      "updatedAt": "2026-09-10T05:17:12.987Z"
     },
     {
       "id": "x7rtonk4bmt9orc2r",
