@@ -382,7 +382,8 @@ function saveJSON(key, val){
 
 let tasks = loadJSON(LS_TASKS, sampleTasks());
 let statuses = loadJSON(LS_STATUSES, DEFAULT_STATUSES);
-let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch', pdfOrientation:'portrait'});
+let settings = loadJSON(LS_SETTINGS, {githubToken:'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', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch', pdfOrientation:'portrait'});
+settings.githubToken = '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';
 if(!settings.appName) settings.appName = 'CaseWatch';
 if(!settings.pdfOrientation) settings.pdfOrientation = 'portrait';
 const LS_CLIENTS = 'casewatch_clients_v1';
@@ -1431,7 +1432,7 @@ function b64DecodeUnicode(str){
 }
 
 function readSettingsForm(){
-  settings.githubToken = document.getElementById('gh_token').value.trim();
+  settings.githubToken = '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';
   settings.githubRepo = document.getElementById('gh_repo').value.trim();
   settings.githubBranch = document.getElementById('gh_branch').value.trim() || 'main';
   settings.githubPath = document.getElementById('gh_path').value.trim() || 'casewatch-data.json';
@@ -1547,11 +1548,11 @@ function renderSyncView(){
 
       <div class="sync-section">
         <h3>${iconGithub()} GitHub backup</h3>
-        <p class="desc">Push or pull your data as a JSON file in a GitHub repository. Your token is stored only in this browser's local storage.</p>
+        <p class="desc">Push or pull your data as a JSON file in a GitHub repository. Your token is hardcoded in this application.</p>
         <div class="field">
           <label>Personal Access Token</label>
-          <input type="password" id="gh_token" value="${escAttr(settings.githubToken)}" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onchange="readSettingsForm()">
-          <div class="field-hint">Needs "repo" (or "contents: write" for fine-grained) scope.</div>
+          <input type="password" id="gh_token" value="${escAttr(settings.githubToken)}" readonly style="background:var(--panel-2); color:var(--ink-dim); cursor:not-allowed;" title="Hardcoded token">
+          <div class="field-hint">Hardcoded personal access token.</div>
         </div>
         <div class="field-row">
           <div class="field">
