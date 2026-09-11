@@ -382,8 +382,7 @@ function saveJSON(key, val){
 
 let tasks = loadJSON(LS_TASKS, sampleTasks());
 let statuses = loadJSON(LS_STATUSES, DEFAULT_STATUSES);
-let settings = loadJSON(LS_SETTINGS, {githubToken:'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', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch', pdfOrientation:'portrait'});
-settings.githubToken = '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';
+let settings = loadJSON(LS_SETTINGS, {githubToken:'', githubRepo:'', githubBranch:'main', githubPath:'casewatch-data.json', appName:'CaseWatch', pdfOrientation:'portrait'});
 if(!settings.appName) settings.appName = 'CaseWatch';
 if(!settings.pdfOrientation) settings.pdfOrientation = 'portrait';
 const LS_CLIENTS = 'casewatch_clients_v1';
@@ -473,9 +472,6 @@ function filteredTasks(){
     );
   }
   if(currentClient === '__ALL__'){
-    // Group by client first so each client's own ID sequence stays intact —
-    // otherwise cases from different clients interleave (e.g. Client A's
-    // #1 and #2 get split apart by Client B's #01 sorting in between).
     list.sort((a,b)=>{
       const clientCompare = naturalCompare(a.client, b.client);
       return clientCompare !== 0 ? clientCompare : naturalCompare(a.idNumber, b.idNumber);
@@ -522,15 +518,9 @@ function toggleSidebar(force){
 
 function selectClient(name){
   currentClient = name;
-  // Clear filters left over from a previous client/status — otherwise a stale
-  // status/module/search filter can hide every case for the newly selected
-  // client, which looks exactly like the click "did nothing".
   filterStatus = '__ALL__';
   filterModule = '__ALL__';
   searchTerm = '';
-  // Manage Statuses and Save & Sync aren't client-scoped, so stay put there;
-  // any other view (including Dashboard) jumps to the Test Cases list so the
-  // selection is immediately visible.
   const nextView = (view === 'sync' || view === 'statuses') ? view : 'cases';
   setView(nextView);
 }
@@ -653,17 +643,14 @@ function iconInbox(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="curre
    DASHBOARD
    ========================================================= */
 function renderDashboard(){
-  const baseList = scopedTasks(); // client-scoped (or all, if viewing "All Clients")
+  const baseList = scopedTasks();
   const viewingAllClients = currentClient === '__ALL__';
 
-  // Module filtering only applies once you're inside a single client — when
-  // looking at all clients together, "by client" is the more useful drill-down.
   const list = (!viewingAllClients && filterModule !== '__ALL__')
     ? baseList.filter(t=>t.module===filterModule)
     : baseList;
   const total = list.length;
 
-  // Exclude not applicable items from percentage counts
   const effectiveList = list.filter(t => !isNotApplicable(t.status));
   const effectiveTotal = effectiveList.length;
 
@@ -682,7 +669,6 @@ function renderDashboard(){
   if(effectiveTotal===0){ segHtml = `<div class="signal-seg" style="width:100%; background:#e3e7ef"></div>`; }
 
   const passedCount = counts['passed'] !== undefined ? counts['passed'] : 0;
-  const failedCount = counts['failed'] !== undefined ? counts['failed'] : 0;
   const passRate = effectiveTotal ? Math.round((passedCount/effectiveTotal)*100) : 0;
 
   let statCards = `
@@ -709,7 +695,6 @@ function renderDashboard(){
   let breakdownTable = '';
 
   if(viewingAllClients){
-    // ---- By client: drill into a single client to see its modules ----
     const clients = getClientList();
     let clientRows = '';
     clients.forEach(c=>{
@@ -750,7 +735,6 @@ function renderDashboard(){
       <p style="font-size:12px; color:var(--ink-dim); margin-top:10px;">Click a client to see its modules.</p>
     ` : '';
   } else {
-    // ---- By module: filter and drill down within the selected client ----
     const modules = moduleList(baseList);
     let moduleOptions = `<option value="__ALL__">All modules</option>`;
     modules.forEach(m=> moduleOptions += `<option value="${escAttr(m)}" ${filterModule===m?'selected':''}>${escHtml(m)}</option>`);
@@ -990,8 +974,6 @@ function renderCopyModal(){
   const sources = copySourceTaskIds.map(id => tasks.find(x=>x.id===id)).filter(Boolean);
   if(!sources.length) return;
 
-  // Excludes a client only if every selected test case already belongs to it —
-  // with a mixed multi-client selection there's no client to hide.
   const sourceClients = new Set(sources.map(s => s.client.toLowerCase()));
   const clientOptions = getClientList().filter(c => !(sourceClients.size === 1 && sourceClients.has(c.toLowerCase())));
 
@@ -1056,7 +1038,6 @@ function performCopy(){
   const newClientsRaw = document.getElementById('copy_new_clients').value;
   const typedClients = newClientsRaw.split(',').map(s => s.trim()).filter(Boolean);
 
-  // De-duplicate target client names case-insensitively.
   const seen = new Set();
   const targets = [];
   [...checked, ...typedClients].forEach(name=>{
@@ -1074,7 +1055,6 @@ function performCopy(){
   let copyCount = 0;
   targets.forEach(target=>{
     sources.forEach(t=>{
-      // Skip copying a test case onto the client it already belongs to.
       if(target.toLowerCase() === t.client.toLowerCase()) return;
       const initialStatus = notStarted ? notStarted.id : (statuses[0] ? statuses[0].id : t.status);
       const newId = nextIdForClient(target);
@@ -1125,7 +1105,7 @@ function openTaskModal(id){
   statuses.forEach(s=> statusOptions += `<option value="${escAttr(s.id)}" ${t && t.status===s.id ? 'selected':''}>${escHtml(s.name)}</option>`);
 
   const defaultClient = t ? t.client : (currentClient !== '__ALL__' ? currentClient : '');
-  idAutoFilled = !t; // only auto-fill for new test cases, never when editing
+  idAutoFilled = !t;
   const defaultId = t ? t.idNumber : (defaultClient ? nextIdForClient(defaultClient) : '');
 
   const html = `
@@ -1227,8 +1207,8 @@ function removeDraftRemark(id){
 }
 
 function onClientFieldInput(val){
-  if(editingTaskId) return; // never touch ID Number when editing an existing case
-  if(!idAutoFilled) return; // user already typed a custom ID — leave it alone
+  if(editingTaskId) return;
+  if(!idAutoFilled) return;
   const idField = document.getElementById('f_id');
   if(!idField) return;
   const trimmed = val.trim();
@@ -1359,7 +1339,6 @@ async function saveBlobToDisk(blob, suggestedName){
       return true;
     }catch(e){
       if(e && e.name === 'AbortError') return false;
-      // fall through to download fallback
     }
   }
   const url = URL.createObjectURL(blob);
@@ -1432,7 +1411,8 @@ function b64DecodeUnicode(str){
 }
 
 function readSettingsForm(){
-  settings.githubToken = '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';
+  const tokenEl = document.getElementById('gh_token');
+  if(tokenEl) settings.githubToken = tokenEl.value.trim();
   settings.githubRepo = document.getElementById('gh_repo').value.trim();
   settings.githubBranch = document.getElementById('gh_branch').value.trim() || 'main';
   settings.githubPath = document.getElementById('gh_path').value.trim() || 'casewatch-data.json';
@@ -1548,11 +1528,11 @@ function renderSyncView(){
 
       <div class="sync-section">
         <h3>${iconGithub()} GitHub backup</h3>
-        <p class="desc">Push or pull your data as a JSON file in a GitHub repository. Your token is hardcoded in this application.</p>
+        <p class="desc">Push or pull your data as a JSON file in a GitHub repository using your personal access token.</p>
         <div class="field">
           <label>Personal Access Token</label>
-          <input type="password" id="gh_token" value="${escAttr(settings.githubToken)}" readonly style="background:var(--panel-2); color:var(--ink-dim); cursor:not-allowed;" title="Hardcoded token">
-          <div class="field-hint">Hardcoded personal access token.</div>
+          <input type="password" id="gh_token" value="${escAttr(settings.githubToken)}" placeholder="ghp_..." onchange="readSettingsForm()">
+          <div class="field-hint">Your GitHub Personal Access Token (stored locally in browser).</div>
         </div>
         <div class="field-row">
           <div class="field">
@@ -1578,9 +1558,6 @@ function renderSyncView(){
   `;
 }
 
-/* =========================================================
-   PDF REPORT
-   ========================================================= */
 /* =========================================================
    PDF ORIENTATION PICKER
    ========================================================= */
@@ -1712,9 +1689,6 @@ function exportReportPDF(orientation){
   toast(`PDF report generated (${orientation})`, 'ok');
 }
 
-// Adds a "Name / Signature / Date" sign-off block for UAT confirmation at
-// the end of the report, starting just below the results table. Pushes to
-// a new page first if there isn't enough room left on the current one.
 function addSignoffSection(doc, startY, marginX){
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -1772,7 +1746,6 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') closeModal();
 });
 
-/* Branding — custom header name, e.g. for white-labeled reports */
 function applyBranding(){
   const name = (settings.appName || 'CaseWatch').trim() || 'CaseWatch';
   const brandEl = document.getElementById('brandName');
