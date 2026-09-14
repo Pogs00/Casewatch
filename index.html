@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg: #eef1f6;
@@ -606,6 +607,7 @@ function render(){
     sub.textContent = scopeLabel + moduleSuffix + ' · sorted by ID ascending';
     actions.innerHTML = `
       <button class="btn" onclick="openPdfExportModal()">${iconFile()} Export PDF</button>
+      <button class="btn" onclick="exportReportExcel()">${iconSheet()} Export Excel</button>
       <button class="btn btn-primary" onclick="openTaskModal()">${iconPlus()} Add test case</button>
     `;
     content.innerHTML = renderCasesView();
@@ -638,6 +640,7 @@ function iconGithub(){ return `<svg viewBox="0 0 24 24" fill="currentColor"><pat
 function iconCheck(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`; }
 function iconFolder(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>`; }
 function iconInbox(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg>`; }
+function iconSheet(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>`; }
 
 /* =========================================================
    DASHBOARD
@@ -1500,7 +1503,7 @@ function renderSyncView(){
     <div class="panel-block" style="padding:22px 24px; max-width:680px;">
       <div class="sync-section">
         <h3>${iconEdit()} Branding</h3>
-        <p class="desc">Rename the header shown in the sidebar, browser tab, and generated PDF reports — handy for white-labeling reports per client or agency.</p>
+        <p class="desc">Rename the header shown in the sidebar, browser tab, and generated PDF/Excel reports — handy for white-labeling reports per client or agency.</p>
         <div class="field" style="max-width:320px;">
           <label>Header / report name</label>
           <input type="text" id="app_name" value="${escAttr(settings.appName || 'CaseWatch')}" placeholder="CaseWatch" onchange="updateAppName(this.value)">
@@ -1519,10 +1522,11 @@ function renderSyncView(){
       </div>
 
       <div class="sync-section">
-        <h3>${iconFile()} PDF report</h3>
-        <p class="desc">Generate a printable report of the currently selected client's test cases (respects active filters), sorted by ID ascending.</p>
+        <h3>${iconFile()} Report exports</h3>
+        <p class="desc">Generate a report of the currently selected client's test cases (respects active filters), sorted by ID ascending — as a printable PDF or as an Excel workbook you can filter, sort, or hand off for further analysis.</p>
         <div class="sync-row">
           <button class="btn btn-primary" onclick="openPdfExportModal()">${iconFile()} Generate PDF report</button>
+          <button class="btn btn-primary" onclick="exportReportExcel()">${iconSheet()} Generate Excel report</button>
         </div>
       </div>
 
@@ -1730,6 +1734,61 @@ function addSignoffSection(doc, startY, marginX){
     doc.setTextColor(90);
     doc.text(label, x, lineY + 14);
   });
+}
+
+/* =========================================================
+   EXCEL EXPORT
+   ========================================================= */
+function exportReportExcel(){
+  if(!window.XLSX){ toast('Excel library did not load — check your connection', 'err'); return; }
+  const list = filteredTasks();
+  const scopeLabel = currentClient === '__ALL__' ? 'All clients' : currentClient;
+
+  const counts = {};
+  statuses.forEach(s=>counts[s.id]=0);
+  list.forEach(t=>{ counts[t.status] = (counts[t.status]||0)+1; });
+
+  const summaryData = [
+    [settings.appName || 'CaseWatch', 'Test Case Report'],
+    [],
+    ['Scope', scopeLabel],
+    ['Generated', new Date().toLocaleString()],
+    ['Total test cases', list.length],
+    [],
+    ['Status', 'Count'],
+    ...statuses.map(s => [s.name, counts[s.id] || 0])
+  ];
+  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+  summaryWs['!cols'] = [{wch:22},{wch:22}];
+
+  const header = ['ID','Client','Module','Description','Steps','Expected Result','Status','Latest Remark'];
+  const rows = list.map(t=>{
+    const st = statusById(t.status);
+    const lastRemark = t.remarks && t.remarks.length ? t.remarks[t.remarks.length-1] : null;
+    return [
+      t.idNumber || '',
+      t.client || '',
+      t.module || '',
+      t.description || '',
+      t.steps || '',
+      t.expectedResult || '',
+      st.name,
+      lastRemark ? `${lastRemark.text} (${formatDateTime(lastRemark.ts)})` : ''
+    ];
+  });
+  const casesWs = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  casesWs['!cols'] = [
+    {wch:10}, {wch:16}, {wch:16}, {wch:36}, {wch:36}, {wch:36}, {wch:14}, {wch:36}
+  ];
+  casesWs['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:rows.length, c:header.length-1} }) };
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+  XLSX.utils.book_append_sheet(wb, casesWs, 'Test Cases');
+
+  const slug = (settings.appName || 'CaseWatch').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'casewatch';
+  XLSX.writeFile(wb, `${slug}-report-${scopeLabel.replace(/[^a-z0-9]+/gi,'_')}-${dateStamp()}.xlsx`);
+  toast('Excel report generated', 'ok');
 }
 
 function hexToRgb(hex){
